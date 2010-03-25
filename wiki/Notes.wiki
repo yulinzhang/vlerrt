@@ -1,9 +1,8 @@
-#summary One-sentence summary of this page.
+#notes on the project
 
-= Introduction =
+= Structure =
 
-Add your content here.
-
+TODO:
 
 = Details =
 

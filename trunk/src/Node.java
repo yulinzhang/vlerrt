@@ -1,8 +1,8 @@
-import java.awt.Point;
+import java.awt.geom.Point2D;
 
 
 public interface Node {
-	Point getPoint();
+	Point2D.Double getPoint();
 	Node getParent();
 	boolean isRoot();
 	

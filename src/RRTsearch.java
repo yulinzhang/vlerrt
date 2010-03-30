@@ -18,11 +18,8 @@ public class RRTsearch {
 		w = new RRTWorld(400,400);	
 		searchTree = new RRTtree(new RRTnode(w.start(),null));
 		r = new Random(System.currentTimeMillis());
-		w.setSearchTree(searchTree);
-		w.display();
+		GUI.display(w, searchTree, "RRTWorld");
 	}
-	
-	
 	
 	public RRTsearch(int p) {
 		this();

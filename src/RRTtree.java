@@ -61,7 +61,7 @@ public class RRTtree implements Tree {
 		if (nodes != null) {
 			return nodes.iterator();
 		} else
-			return null;
+			return null; //FIXME: returning null is evil, no wait to return empty instead?
 	}
 
 }

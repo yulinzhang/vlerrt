@@ -21,6 +21,9 @@ import javax.swing.JPanel;
  *  - intersects with the INTERIOR of the rectangle (*NOT* its border)
  */
 
+//TODO: split this into a special GUI class
+//TODO: world in a text file
+
 @SuppressWarnings("serial")
 public class RRTWorld extends JPanel implements World, MouseListener {
 
@@ -41,8 +44,17 @@ public class RRTWorld extends JPanel implements World, MouseListener {
 		frame.setVisible(true);
 	}
 	
-	// ---
-	public boolean collides(Point2D.Double o, Point2D.Double e) {
+	public boolean collides(Point2D point){
+		return false;
+	}
+	
+	/**
+	 * checks if o-e line collides with any of the world's obstacles
+	 * and if 'e' falls out of bounds.
+	 */
+	public boolean collides(Point2D o, Point2D e) {
+		if( e.getX() < 0 || e.getY() < 0 || e.getX() >= w || e.getY() >= h )
+			return true;
 		
 		Line2D line = new Line2D.Double(o,e);
 		
@@ -103,6 +115,7 @@ public class RRTWorld extends JPanel implements World, MouseListener {
 		while( n-- > 0 )
 			obstacles.add( new Rectangle(r.nextInt(w),r.nextInt(h),20,20));
 
+		//FIXME: not inside a BLOCK!!
 		start = new Point2D.Double(r.nextInt(w), r.nextInt(h));
 		goal = new Point2D.Double(r.nextInt(w), r.nextInt(h));
 		
@@ -110,6 +123,8 @@ public class RRTWorld extends JPanel implements World, MouseListener {
 	}
 	
 	protected void paintWorld(Graphics2D g){
+//		g.setRenderingHint( java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON );
+		
 		g.setColor(OBSTACLE);
 		for(Rectangle2D r : obstacles)
 			g.fill(r);
@@ -135,12 +150,12 @@ public class RRTWorld extends JPanel implements World, MouseListener {
 		Tree rtt = searchTree;
 		//draw full tree
 		if( rtt != null ){
-			g.setColor(Color.BLACK);
+			g.setColor(Color.BLACK);//TODO: iterator retusn null?
 			for( Node n : rtt ){
 				if( n.isRoot() )
 					continue;
-				Point2D.Double leaf = n.getPoint();
-				Point2D.Double parent = n.getParent().getPoint();
+				Point2D leaf = n.getPoint();
+				Point2D parent = n.getParent().getPoint();
 				g.draw(new Line2D.Double(leaf,parent));
 			}
 		}
@@ -151,8 +166,8 @@ public class RRTWorld extends JPanel implements World, MouseListener {
 			Node goal = rtt.closestTo(this.goal);
 			while( !goal.isRoot() ){
 				Node parent_node = goal.getParent();
-				Point2D.Double leaf = goal.getPoint();
-				Point2D.Double parent = parent_node.getPoint();
+				Point2D leaf = goal.getPoint();
+				Point2D parent = parent_node.getPoint();
 				g.draw(new Line2D.Double(leaf,parent));
 				goal = parent_node;
 			}

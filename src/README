@@ -8,6 +8,59 @@ World handling:
    - Timer-based iterations...
    - Collisions with the world barriers.
    
+   
+ Distance update:
+ 
+ Each point carries information about its distance factor.
+ 
+ The distance factor has a value between 0 and \Top.
+ 
+ Search has methods to give you the next increase and next decrease
+ 	- Linear / Log / Exponential.
+ 	
+ If collision 
+ 	decrease
+ else
+ 	increase
+ 	
+Use the "complex" KD tree that allows distance. 	
+ 	
+ --------------
+ 
+ Testing & Evaluation:
+ 
+  - Write up the several worlds.
+  - Run a search for a X amount of time
+  - Parameters
+     - Starting value for epsilon
+     - Starting value for d'
+     - Run time
+
+  - "Parse" the search 
+  		- Found the goal or we didnt
+  		- Number of nodes in the tree
+  		- World coverage (distance travelled?)
+
+  - "Shake up" the world for replanning
+  
+  
+World File Format:
+Width \t Height
+START
+GOAL
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+
+
+
+
+  
+ 	
      
  
  

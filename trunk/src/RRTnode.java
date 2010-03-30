@@ -4,9 +4,9 @@ import java.awt.geom.Point2D;
 public class RRTnode implements Node {
 
 	private Node parent;
-	private Point2D.Double pt;
+	private Point2D pt;
 	
-	public RRTnode(Point2D.Double pt, Node parent) {
+	public RRTnode(Point2D pt, Node parent) {
 		this.pt = pt;
 		this.parent = parent;
 	}
@@ -15,7 +15,7 @@ public class RRTnode implements Node {
 		return parent;
 	}
 
-	public Point2D.Double getPoint() {
+	public Point2D getPoint() {
 		return pt;
 	}
 

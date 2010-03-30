@@ -19,7 +19,7 @@ public class RRTtree implements Tree {
 	
 	
 	public void add(Node n) {
-		Point2D.Double pt = n.getPoint();
+		Point2D pt = n.getPoint();
 		double[] coord = { pt.getX(), pt.getY() };
 		try {
 			theTree.insert(coord, n);
@@ -32,7 +32,7 @@ public class RRTtree implements Tree {
 		}
 	}
 
-	public Node closestTo(Point2D.Double pt) {
+	public Node closestTo(Point2D pt) {
 		double[] coord = { pt.getX(), pt.getY() };
 		try {
 			return theTree.nearest(coord);

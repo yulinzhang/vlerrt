@@ -42,7 +42,7 @@ public class RRTsearch {
 	}
 	
 	private Node step() {
-		Point2D.Double toward;
+		Point2D toward;
 		Node from;
 		
 		//find the point to extend towards
@@ -64,7 +64,7 @@ public class RRTsearch {
 		
 	}
 	
-	private Point2D.Double nextPoint(Point2D.Double origin, Point2D.Double towards, int length) {
+	private Point2D.Double nextPoint(Point2D origin, Point2D towards, int length) {
 		double xDelta,yDelta,hypotenuse;
 		double originX, originY, destinationX, destinationY;
 		double newXDelta, newYDelta;

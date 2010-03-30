@@ -3,10 +3,10 @@
 
 World handling:
    - 'Customized' generation of worlds (text file parsing, random, etc.)
-   - Separating drawing from world info.
+   X Separating drawing from world info.
    - Preserving worlds between iterations.
    - Timer-based iterations...
-   - Collisions with the world barriers.
+   X Collisions with the world barriers.
    
    
  Distance update:

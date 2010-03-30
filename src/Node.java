@@ -5,5 +5,7 @@ public interface Node {
 	Point2D getPoint();
 	Node getParent();
 	boolean isRoot();
+	double getEpsilon();
+	void setEpsilon(double e);
 	
 }

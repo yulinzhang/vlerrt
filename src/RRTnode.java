@@ -5,10 +5,20 @@ public class RRTnode implements Node {
 
 	private Node parent;
 	private Point2D pt;
+	private double epsilon;
 	
-	public RRTnode(Point2D pt, Node parent) {
+	public RRTnode(Point2D pt, Node parent, double epsilon) {
 		this.pt = pt;
 		this.parent = parent;
+		this.epsilon = epsilon;
+	}
+	
+	public double getEpsilon() {
+		return epsilon;
+	}
+
+	public void setEpsilon(double epsilon) {
+		this.epsilon = epsilon;
 	}
 	
 	public Node getParent() {

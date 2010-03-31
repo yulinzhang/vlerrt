@@ -1,7 +1,6 @@
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-
 public interface World {
 
 	public boolean collides(Point2D o);
@@ -15,5 +14,7 @@ public interface World {
 
 	public int height();
 	public int width();
+	
+	void write(String file) throws Exception;
 	
 }

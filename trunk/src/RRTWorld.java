@@ -2,29 +2,76 @@ import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 /*
  *  intersects with the INTERIOR of the rectangle (*NOT* its border)
- *  TODO: world in a text file
  */
 
 public class RRTWorld implements World {
+	
+	public static void main(String[] args) throws Exception{
+		RRTWorld w = new RRTWorld("asd");
+//		w.write("asd");
+		GUI.display(w, null, "ok");
+	}
 	
 	protected Random r;
 	protected List<Rectangle2D> obstacles;
 	
 	protected int w, h;
 	protected Point2D start, goal;
-	protected Tree searchTree = null;
+	
+	public RRTWorld(String file) throws Exception{
+		r = new Random(System.currentTimeMillis());
+		
+		Scanner sc = new Scanner(new File(file));
+		
+		w = sc.nextInt();
+		h = sc.nextInt();
+		
+		start = new Point2D.Double(sc.nextInt(), sc.nextInt());
+		goal = new Point2D.Double(sc.nextInt(), sc.nextInt());
+		
+		obstacles = new LinkedList<Rectangle2D>();
+		
+		//note that his assumes the format is always correct and that if
+		//there is a next, then there will always exist the 4 next ints.
+		while(sc.hasNext()){
+			obstacles.add( new Rectangle(
+					sc.nextInt(), //x
+					sc.nextInt(), //y
+					sc.nextInt(), //w
+					sc.nextInt()  //h
+					));
+		}
+		sc.close();
+	}
+	
+
+	public void write(String file) throws Exception{
+		PrintWriter o = new PrintWriter(new File(file));
+		o.printf("%d\t%d\n", w,h);
+		o.printf("%d\t%d\n", (int)start.getX(), (int)start.getY());
+		o.printf("%d\t%d\n", (int)goal.getX(), (int)goal.getY());
+		for(Rectangle2D r : obstacles)
+			o.printf("%d\t%d\t%d\t%d\n", 
+					(int)r.getX(), 
+					(int)r.getY(), 
+					(int)r.getWidth(), 
+					(int)r.getHeight());
+		o.close();
+	}
 	
 	public RRTWorld(int w, int h){ //TODO: more initial parameters?
-		super();
+		this.r = new Random(System.currentTimeMillis());
 		this.w = w;
 		this.h = h;
-		this.r = new Random(System.currentTimeMillis());
 
 		obstacles = new LinkedList<Rectangle2D>();
 		

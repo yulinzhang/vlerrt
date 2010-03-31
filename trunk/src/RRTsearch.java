@@ -7,6 +7,8 @@ public class RRTsearch {
 	public static void main(String[] args){
 		RRTsearch search = basicRRT(new RRTWorld(400,400),20,10);
 		search.runSearch();
+		search.show();
+
 		RRTsearch searchVLRRT = VLRRT(new RRTWorld(400,400),20,10,1);
 		searchVLRRT.runSearch();
 	}
@@ -67,7 +69,11 @@ public class RRTsearch {
 	private void init() {
 		searchTree = new RRTtree(new RRTnode(w.start(),null,baseEpsilon));
 		r = new Random(System.currentTimeMillis());
+	}
+	
+	public void show(){
 		GUI.display(w, searchTree, "RRTWorld");
+//		GUI.screenshot(w, searchTree, "asd");	
 	}
 	
 	public void runSearch() {

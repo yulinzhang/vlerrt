@@ -1,46 +1,37 @@
 import java.awt.geom.Point2D;
 import java.util.Iterator;
-import java.util.List;
 
-import edu.wlu.cs.levy.CG.KDTree;
-import edu.wlu.cs.levy.CG.KeyDuplicateException;
-import edu.wlu.cs.levy.CG.KeySizeException;
+import com.savarese.spatial.GenericPoint;
+import com.savarese.spatial.KDTree;
+import com.savarese.spatial.NearestNeighbors;
+import com.savarese.spatial.NearestNeighbors.Entry;
 
 public class RRTtree implements Tree {
 
-	private KDTree<Node> theTree;
+	private KDTree<Double,GenericPoint<Double>,Node> theTree;
 	private Node root;
+	private NearestNeighbors<Double,GenericPoint<Double>,Node> neighborQuery;
 	
 	public RRTtree(Node root) {
 		this.root = root;
-		theTree = new KDTree<Node>(2);
+		theTree = new KDTree<Double,GenericPoint<Double>,Node>(2);
 		add(root);
+		neighborQuery = new NearestNeighbors<Double,GenericPoint<Double>,Node>();  //Euclidean distance neighbor search
 	}
 	
 	
 	public void add(Node n) {
 		Point2D pt = n.getPoint();
-		double[] coord = { pt.getX(), pt.getY() };
-		try {
-			theTree.insert(coord, n);
-		} catch (KeySizeException e) {
-			// Will never occurr
-			e.printStackTrace();
-		} catch (KeyDuplicateException e) {
-			// TODO might happen if we are already at the goal - code needed to catch this case
-			e.printStackTrace();
-		}
+		theTree.put(new GenericPoint<Double>(pt.getX(),pt.getY()), n);
 	}
 
 	public Node closestTo(Point2D pt) {
-		double[] coord = { pt.getX(), pt.getY() };
-		try {
-			return theTree.nearest(coord);
-		} catch (KeySizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+		Entry<Double,GenericPoint<Double>,Node>[] neighbors = 
+			neighborQuery.get(theTree, new GenericPoint<Double>(pt.getX(),pt.getY()), 1);
+		if (neighbors.length > 0) {
+			return neighbors[0].getNeighbor().getValue();
+		} else return null; 
+
 	}
 
 	public Node root() {
@@ -48,20 +39,7 @@ public class RRTtree implements Tree {
 	}
 
 	public Iterator<Node> iterator() {
-		List<Node> nodes = null;
-		try {
-			double[] origin = { 0, 0 };  //TODO : this implementation does not have an easy way to get the values, have to get size() nearest neighbors
-			nodes = theTree.nearest(origin, theTree.size());
-		} catch (KeySizeException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		}
-		
-		if (nodes != null) {
-			return nodes.iterator();
-		} else
-			return null; //FIXME: returning null is evil, no wait to return empty instead?
+		return theTree.values().iterator();
 	}
 
 }

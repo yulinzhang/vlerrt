@@ -11,6 +11,7 @@ public class RRTsearch {
 
 		RRTsearch searchVLRRT = VLRRT(new RRTWorld(400,400),20,10,1);
 		searchVLRRT.runSearch();
+		searchVLRRT.show();
 	}
 	
 	private enum Algorithm {

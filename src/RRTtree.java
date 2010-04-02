@@ -12,6 +12,9 @@ public class RRTtree implements Tree {
 	private Node root;
 	private NearestNeighbors<Double,GenericPoint<Double>,Node> neighborQuery;
 	
+	
+	
+	
 	public RRTtree(Node root) {
 		this.root = root;
 		theTree = new KDTree<Double,GenericPoint<Double>,Node>(2);

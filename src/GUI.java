@@ -72,7 +72,6 @@ public class GUI extends JPanel {
 			}
 		};
 		Dimension d = new Dimension(world.width(),world.height());
-		p.setMinimumSize(d);
 		p.setPreferredSize(d);
 		p.setBackground(BACKGROUND);
 		add(p);

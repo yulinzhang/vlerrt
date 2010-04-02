@@ -68,9 +68,19 @@ public class RRTsearch {
 
 	}
 	
+	static public double euclidianDistance(Point2D p1, Point2D p2) {
+		
+		return Math.sqrt(Math.pow(p1.getX()-p2.getX(), 2)+Math.pow(p1.getY()-p2.getY(),2));
+	}
+	
+	
 	private void init() {
 		searchTree = new RRTtree(new RRTnode(w.start(),null,baseEpsilon));
 		r = new Random(System.currentTimeMillis());
+	}
+	
+	public Tree getsearchTree() {
+		return searchTree;
 	}
 	
 	public void show(){
@@ -78,29 +88,42 @@ public class RRTsearch {
 //		GUI.screenshot(w, searchTree, "asd");	
 	}
 	
+	public void screenshot(String filename) {
+		GUI.screenshot(w,searchTree,filename);
+	}
+	
+	
+	
 	public void runSearch() {
 		Node next = null;
 		for (int count = 1; count < 100 && !done; count++){
-			next = step();
+			next = step(new Stats()); //Dummy
 			if (next != null) searchTree.add(next);
 		}
 	}
 	
-	public void runSearchHalt() {
+	public int runSearchHalt(Stats stats) {
+		int nItrs = 0;
 		Node next = null;
 		while (!done && !halt) {
-			next = step();
+			next = step(stats);
 			if (next != null) searchTree.add(next);
+			nItrs++;
 		}
+		return nItrs;
 		
 	}
 	
 	public void halt() {
 		halt = true;
 	}
+	
+	public boolean foundGoal() {
+		return done;
+	}
 
 	
-	private Node step() {
+	private Node step(Stats stats) {
 		Point2D toward, destination;
 		Node from;
 		boolean toGoal = false, reachGoal = false;
@@ -127,9 +150,9 @@ public class RRTsearch {
 		
 		if(w.collides(from.getPoint(), destination)) { //collision, decrease the
 			switch (type) { //extra functionality for VLRRT
-			case VLRRT: 
+			case VLRRT: break;
 			case VLERRT:
-				decreaseEpsilon(from);
+				decreaseEpsilon(from); break;
 			}
 			return null;
 		}
@@ -137,17 +160,21 @@ public class RRTsearch {
 			if (reachGoal) done = true;  //didn't collide, will reach goal
 			double newEpsilon = baseEpsilon; //normal is the baseEpsilon (1 when not used)
 			switch (type) {
-			case VLRRT: 
+			case VLRRT: break;
 			case VLERRT:
-				newEpsilon = increaseEpsilon(from);
+				newEpsilon = increaseEpsilon(from); break;
 			}
+			stats.incTreeCoverage(RRTsearch.euclidianDistance(from.getPoint(), destination));
 			return new RRTnode(destination,from, newEpsilon);	
 		}
 		
+	
 		
 	}
 	
 	private Point2D.Double nextPoint(Point2D origin, Point2D towards, double length) {
+
+		
 		double xDelta,yDelta,hypotenuse;
 		double originX, originY, destinationX, destinationY;
 		double newXDelta, newYDelta;

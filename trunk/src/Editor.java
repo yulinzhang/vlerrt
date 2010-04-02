@@ -1,7 +1,10 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -41,7 +44,7 @@ import javax.swing.JPopupMenu;
 //}
 
 @SuppressWarnings("serial")
-public class Editor extends GUI implements MouseListener, MouseMotionListener  {
+public class Editor extends GUI implements MouseListener, MouseMotionListener, ComponentListener  {
 
 	static final Color REALLY_LIGHT_GRAY = new Color(0.95f,0.95f,0.95f);
 	static final int SPACE = 40;
@@ -57,13 +60,16 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener  {
 
 	JPopupMenu menu;
 	Mode m;
-	Point2D point;
+	Point2D point,old;
+	String file;
 
-	public Editor(World world) {
-		super(world,null);
-
+	public Editor(String f) throws Exception {
+		super(new RRTWorld(f),null);
+		file = f;
+		
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addComponentListener(this);
 
 		m = Mode.NONE;
 		menu = new JPopupMenu();
@@ -89,34 +95,54 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener  {
 
 		menu.addSeparator();
 
-		menu.add(new AbstractAction("load") {
-			public void actionPerformed(ActionEvent e) {   }
-		});
-
 		menu.add(new AbstractAction("save") {
-			public void actionPerformed(ActionEvent e) {   }
+			public void actionPerformed(ActionEvent e) {
+				try {
+					world.write(file);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}  }
 		});
-		
-		menu.add(new AbstractAction("quick save") {
-			public void actionPerformed(ActionEvent e) {   }
-		});
-
-		
-		//TODO: resize window for new dimensions...use component width
 
 	}
 
 	public void draw(Graphics2D g, World world, Tree tree){
 		super.draw(g, world, tree);
 		
-		print(g,"OPT: "+m);
+		if( m == Mode.NEW_OBSTACLE_PT2 ){
+			g.drawRect(						
+					(int) Math.min( point.getX(), old.getX() ), //x
+					(int) Math.min( point.getY(), old.getY() ), //y
+					(int) Math.abs( old.getX() - point.getX() ), //w
+					(int) Math.abs( old.getY() - point.getY() )  //h 
+					);
+		}
+		
+		if( m == Mode.DELETE_OBSTACLE ){
+			List<Rectangle2D> list = ((RRTWorld)world).obstacles;
+			Iterator<Rectangle2D> it = list.iterator();
+			while( it.hasNext() ){
+				Rectangle2D o = it.next();
+				if( o.contains(point) ){
+					g.setColor(Color.RED);
+					g.fill(o);
+					break;
+				}
+			}
+		}
+
+		print(""+m+" @ "+world);
 	}
 
-	protected void print(Graphics2D g, String txt){
-		g.setColor(Color.BLACK);
-		g.drawString(txt, 0, getHeight()-50);
-	}
+//	protected void print(Graphics2D g, String txt){
+//		g.setColor(Color.BLACK);
+//		g.drawString(txt, 0, getHeight()-50);
+//	}
 
+	protected void print(String txt){
+		
+	}
+	
 	protected void mark(Graphics2D g, int x, int y, Color c){
 		g.setColor(c);
 		g.drawLine(x-2,y-2,x+2,y+2);
@@ -128,7 +154,6 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener  {
 	public void mouseExited(MouseEvent e) { }
 	public void mousePressed(MouseEvent e) { }
 	public void mouseReleased(MouseEvent e) {
-		Point2D old = point;
 		point = new Point2D.Double(e.getX(), e.getY());
 		
 		if( e.getButton() == MouseEvent.BUTTON1 ){
@@ -141,24 +166,24 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener  {
 				break;
 			case DELETE_OBSTACLE:
 				//FIXME: buggy! origins is incorrect!
-				Point2D target = point;
 				List<Rectangle2D> list = ((RRTWorld)world).obstacles;
 				Iterator<Rectangle2D> it = list.iterator();
 				while( it.hasNext() ){
 					Rectangle2D o = it.next();
-					if( o.contains(target) ){
+					if( o.contains(point) ){
 						it.remove();
 						break;
 					}
 				}
 				break;
 			case NEW_OBSTACLE_PT1:
+				old = point;
 				m = Mode.NEW_OBSTACLE_PT2;
 				break;
 			case NEW_OBSTACLE_PT2:
 				Rectangle2D rect = new Rectangle(
-						(int) old.getX(), //x
-						(int) old.getY(), //y
+						(int) Math.min( point.getX(), old.getX() ), //x
+						(int) Math.min( point.getY(), old.getY() ), //y
 						(int) Math.abs( old.getX() - point.getX() ), //w
 						(int) Math.abs( old.getY() - point.getY() )  //h
 						);
@@ -178,25 +203,35 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener  {
 
 	public void mouseDragged(MouseEvent e) { }
 	public void mouseMoved(MouseEvent e) { 
-//		if( m == Mode.TRANSLATE ){
-//			x1 = e.getX();
-//			y1 = e.getY();
-//			repaint();
-//		}
-//
-//		if( m == Mode.BUILD_SIDE_2ND_SIDE ){
-//			x1 = e.getX(); 
-//			y1 = e.getY();
-//			repaint();
-//		}
+		if( m == Mode.NEW_OBSTACLE_PT2 || m == Mode.DELETE_OBSTACLE ){
+			point = new Point2D.Double(e.getX(), e.getY());
+			repaint();
+		}
 	}
 
 	public static void main(String[] args) throws Exception{
-		JFrame frame = new JFrame("Editor");
+		final JFrame frame = new JFrame("Editor");
+		frame.setLayout(new BorderLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new Editor(new RRTWorld(800,600)));
+		frame.add(new Editor("asd"){
+			protected void print(String txt){
+				frame.setTitle(txt);
+			}
+		},BorderLayout.CENTER);
 		frame.pack();
 		frame.setVisible(true);		
+	}
+
+	public void componentHidden(ComponentEvent e) { }
+
+	public void componentMoved(ComponentEvent e) { }
+
+	public void componentResized(ComponentEvent e) {
+//		System.out.println(e);
+	}
+
+	public void componentShown(ComponentEvent e) {
+		
 	}
 }
 

@@ -2,11 +2,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -17,7 +16,7 @@ import javax.swing.JPanel;
  */
 
 @SuppressWarnings("serial")
-public class GUI extends JPanel implements MouseListener {
+public class GUI extends JPanel {
 
 	public static void display(World world, Tree tree, String title){
 		JFrame frame = new JFrame(title);
@@ -26,27 +25,31 @@ public class GUI extends JPanel implements MouseListener {
 		frame.pack();
 		frame.setVisible(true);		
 	}
+	
+	protected BufferedImage createImage() {
+	    BufferedImage bi = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+	    Graphics2D g = bi.createGraphics();
+	    paint(g);
+	    return bi;
+	}
 
 	public static void screenshot(World world, Tree tree,String filename){
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new GUI(world,tree));
+		GUI gui = new GUI(world,tree);
+		frame.add(gui);
 		frame.pack();
-		frame.setVisible(true);
 		try {
-			javax.imageio.ImageIO.write(
-					new java.awt.Robot().createScreenCapture(
-							frame.getBounds()
-					), "jpg", new java.io.File(filename+".jpg"));
+			javax.imageio.ImageIO.write( gui.createImage()
+					, "png", new java.io.File(filename+".png"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		frame.setVisible(false);
 		frame.dispose();
 	}
 
-	protected World world;
-	protected Tree tree;
+	protected final World world;
+	protected final Tree tree;
 
 	static final protected Color BACKGROUND = Color.WHITE;
 	static final protected Color OBSTACLE = Color.BLACK;
@@ -56,16 +59,16 @@ public class GUI extends JPanel implements MouseListener {
 	static final protected Color PATH = Color.BLUE;
 	static final protected Color ALL_PATH = Color.DARK_GRAY;
 
-	public GUI(World world, Tree tree){
+	public GUI(World w, Tree t){
 		super();
-		this.world = world;
-		this.tree = tree;
+		this.world = w;
+		this.tree = t;
 
 		//component contains the world
 		JPanel p = new JPanel(){
 			public void paint(Graphics g) {
 				super.paint(g);
-				paintWorld((Graphics2D) g);
+				draw((Graphics2D) g, world, tree);
 			}
 		};
 		Dimension d = new Dimension(world.width(),world.height());
@@ -73,11 +76,9 @@ public class GUI extends JPanel implements MouseListener {
 		p.setPreferredSize(d);
 		p.setBackground(BACKGROUND);
 		add(p);
-
-		addMouseListener(this);
 	}
 
-	protected void paintWorld(Graphics2D g){
+	public void draw(Graphics2D g, World world, Tree tree){
 		// this does not improve the drawing at all...		
 		//		g.setRenderingHint( java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON );
 
@@ -93,12 +94,6 @@ public class GUI extends JPanel implements MouseListener {
 		g.setColor(BOUNDS);
 		for(Rectangle2D r : world.obstacles())
 			g.draw(r);
-
-		//this is collision testing code
-		if( x!= null && y != null ){
-			g.setColor( world.collides(x,y) ? Color.RED : Color.GREEN );
-			g.draw(new Line2D.Double(x,y));
-		}
 
 		if( tree != null ){
 			//all rrt paths
@@ -131,22 +126,4 @@ public class GUI extends JPanel implements MouseListener {
 		g.drawOval((int)world.start().getX()-1, (int)world.start().getY()-1, 2, 2);
 	}
 
-
-	//
-	//this is just for debug
-	//
-
-	protected Point2D x,y;
-
-	public void mouseClicked(MouseEvent e) {}
-	public void mouseEntered(MouseEvent e) {}
-	public void mouseExited (MouseEvent e) {}
-	public void mousePressed(MouseEvent e) {}
-	public void mouseReleased(MouseEvent e) {
-		if( e.getButton() == MouseEvent.BUTTON1 )
-			x = new Point2D.Double(e.getX(),e.getY());
-		if( e.getButton()== MouseEvent.BUTTON3 )
-			y = new Point2D.Double(e.getX(),e.getY());
-		this.repaint();
-	}
 }

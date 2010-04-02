@@ -14,7 +14,7 @@ public class Testing {
 	
 /* Class for testing and evaluating the RRT algorithms */
 	
-	private final double PROB_CHANGE_OBSTACLE = 0.5;
+	private final double PROB_CHANGE_OBSTACLE = 0.2;
 	
 	private World world;
 	private RRTsearch searcher;
@@ -166,11 +166,11 @@ public class Testing {
 
 	
 	private double getRandomShiftX(Random rng,int width) {
-		return rng.nextBoolean()? rng.nextInt((int)(width*0.05)) : -(rng.nextInt((int)(width*0.05)));
+		return rng.nextBoolean()? rng.nextInt((int)(width*0.1)) : -(rng.nextInt((int)(width*0.1)));
 	}
 	
 	private double getRandomShiftY(Random rng, int height) {
-		return rng.nextBoolean()? rng.nextInt((int)(height*0.05)) : -(rng.nextInt((int)(height*0.05)));
+		return rng.nextBoolean()? rng.nextInt((int)(height*0.1)) : -(rng.nextInt((int)(height*0.1)));
 	}
 	
 	private void changeWorld() {
@@ -191,15 +191,15 @@ public class Testing {
 						shiftX += obstacle.getX()+shiftX;
 				} else
 					if (shiftX >= 0)
-						if (obstacle.getX()+shiftX > width)
-							shiftX -= (obstacle.getX()+shiftX - width);
+						if (obstacle.getX()+obstacle.getWidth()+shiftX > width)
+							shiftX -= (obstacle.getX()+obstacle.getWidth()+shiftX - width);
 				if (shiftY < 0) {
 					if (obstacle.getY()+shiftY < 0)
 						shiftY += obstacle.getY()+shiftY;
 				} else
 					if (shiftY >= 0)
-						if (obstacle.getY()+shiftY > height)
-							shiftY -= (obstacle.getY()+shiftY - height);
+						if (obstacle.getY()+obstacle.getHeight()+shiftY > height)
+							shiftY -= (obstacle.getY()+obstacle.getHeight()+shiftY - height);
 				
 				
 				obstacle.setRect(obstacle.getX()+shiftX, obstacle.getY()+shiftY, obstacle.getWidth(), obstacle.getHeight());

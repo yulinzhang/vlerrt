@@ -2,15 +2,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+
 import javax.swing.Timer;
 
 public class Testing { 
 	
 /* Class for testing and evaluating the RRT algorithms */
 	
-	
+	private final double PROB_CHANGE_OBSTACLE = 0.5;
 	
 	private World world;
 	private RRTsearch searcher;
@@ -161,7 +165,63 @@ public class Testing {
 	}
 
 	
+	private double getRandomShiftX(Random rng,int width) {
+		return rng.nextBoolean()? rng.nextInt((int)(width*0.05)) : -(rng.nextInt((int)(width*0.05)));
+	}
+	
+	private double getRandomShiftY(Random rng, int height) {
+		return rng.nextBoolean()? rng.nextInt((int)(height*0.05)) : -(rng.nextInt((int)(height*0.05)));
+	}
+	
 	private void changeWorld() {
+		
+		Random rng = new Random(System.nanoTime());
+		Iterator<Rectangle2D> obsItr = world.obstacles().iterator();
+		int width = world.width();
+		int height = world.height();
+		
+		while (obsItr.hasNext()) {
+			Rectangle2D obstacle = obsItr.next();
+			if (rng.nextDouble() < PROB_CHANGE_OBSTACLE) {
+				double shiftX = getRandomShiftX(rng,width);
+				double shiftY = getRandomShiftY(rng,height);
+
+				if (shiftX < 0) {
+					if (obstacle.getX()+shiftX < 0)
+						shiftX += obstacle.getX()+shiftX;
+				} else
+					if (shiftX >= 0)
+						if (obstacle.getX()+shiftX > width)
+							shiftX -= (obstacle.getX()+shiftX - width);
+				if (shiftY < 0) {
+					if (obstacle.getY()+shiftY < 0)
+						shiftY += obstacle.getY()+shiftY;
+				} else
+					if (shiftY >= 0)
+						if (obstacle.getY()+shiftY > height)
+							shiftY -= (obstacle.getY()+shiftY - height);
+				
+				
+				obstacle.setRect(obstacle.getX()+shiftX, obstacle.getY()+shiftY, obstacle.getWidth(), obstacle.getHeight());
+
+				
+			}
+		}
+		
+		
+		
+	}
+	
+	
+	
+	private void execNRuns(int n, RRTsearch.Algorithm alg) {
+		
+		for (int i=0;i<n;i++) {
+			execSearch(alg);
+			changeWorld();
+		}
+		
+		
 		
 	}
 	
@@ -169,8 +229,7 @@ public class Testing {
 	public static void main(String[] args) {
 		Testing test = new Testing(20, 10, 0, null, 0, "asd");
 		
-		test.execSearch(RRTsearch.Algorithm.RRT);
-	
+		test.execNRuns(5,RRTsearch.Algorithm.RRT);
 
 	}
 

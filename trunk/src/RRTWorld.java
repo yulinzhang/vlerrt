@@ -141,4 +141,15 @@ public class RRTWorld implements World {
 	public int width() {
 		return w;
 	}
+
+
+	public void setGoal(Point2D goal) {
+		this.goal = goal;
+	}
+
+
+
+	public void setStart(Point2D start) {
+		this.start = start;
+	}
 }

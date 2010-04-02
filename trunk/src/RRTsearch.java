@@ -14,7 +14,7 @@ public class RRTsearch {
 		searchVLRRT.show();
 	}
 	
-	private enum Algorithm {
+	public enum Algorithm {
 		RRT, ERRT, VLRRT, VLERRT
 	}
 	
@@ -46,6 +46,7 @@ public class RRTsearch {
 	private List<Node> wayPoints;
 	private Tree searchTree;
 	private boolean done = false;
+	private boolean halt = false;
 	
 	public RRTsearch() {
 		w = new RRTWorld(400,400);	
@@ -84,6 +85,20 @@ public class RRTsearch {
 			if (next != null) searchTree.add(next);
 		}
 	}
+	
+	public void runSearchHalt() {
+		Node next = null;
+		while (!done && !halt) {
+			next = step();
+			if (next != null) searchTree.add(next);
+		}
+		
+	}
+	
+	public void halt() {
+		halt = true;
+	}
+
 	
 	private Node step() {
 		Point2D toward, destination;

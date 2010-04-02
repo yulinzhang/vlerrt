@@ -41,6 +41,10 @@ public class RRTtree implements Tree {
 		return root;
 	}
 
+	public int nNodes() {
+		return theTree.size();
+	}
+	
 	public Iterator<Node> iterator() {
 		return theTree.values().iterator();
 	}

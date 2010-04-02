@@ -1,10 +1,9 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Line2D;
+
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimerTask;
 import javax.swing.Timer;
 
 public class Testing { 
@@ -129,6 +128,7 @@ public class Testing {
 		}
 		System.out.println("World Coverage: "+stat.getTreeCoverage());
 		System.out.println("Goal Distance: "+stat.getgDistance());
+		stat.setnNodes(searcher.getsearchTree().nNodes());
 		stats.add(stat); //Store for future processing.
 		
 		searcher.show();
@@ -160,6 +160,10 @@ public class Testing {
 		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, baseEpsilon, pWayPoint, wayPoints);
 	}
 
+	
+	private void changeWorld() {
+		
+	}
 	
 
 	public static void main(String[] args) {

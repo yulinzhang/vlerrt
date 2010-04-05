@@ -5,17 +5,46 @@ import java.util.Random;
 public class RRTsearch {
 	//TEST
 	public static void main(String[] args){
-		RRTsearch search = basicRRT(new RRTWorld(400,400),20,10);
+		World testWorld;
+		try {
+			testWorld = new RRTWorld("asd");
+		} catch (Exception e) {
+			testWorld = new RRTWorld(400,400);
+		}
+
+		
+		RRTsearch search = basicRRT(testWorld,20,10);
 		search.runSearch();
 		search.show();
 
-		RRTsearch searchVLRRT = VLRRT(new RRTWorld(400,400),20,10,1);
+		try {
+			testWorld = new RRTWorld("asd");
+		} catch (Exception e) {
+			testWorld = new RRTWorld(400,400);
+		}
+		
+		RRTsearch searchVLRRT = VLRRT(testWorld,20,10,1);
 		searchVLRRT.runSearch();
 		searchVLRRT.show();
+		
+		try {
+			testWorld = new RRTWorld("asd");
+		} catch (Exception e) {
+			testWorld = new RRTWorld(400,400);
+		}
+		
+		RRTsearch searchDVLRRT = DVLRRT(testWorld,20,10,1);
+		searchDVLRRT.runSearch();
+		searchDVLRRT.show();
 	}
 	
 	public enum Algorithm {
-		RRT, ERRT, VLRRT, VLERRT
+		RRT, //standard RRT algorithm
+		ERRT, //standard RRT algorithm with replanning using waypoints
+		VLRRT,  //variable length RRT algorithm.  Nodes keep track of a single epsilon value 
+		VLERRT, //variable length RRT algorithm with replanning using waypoints.
+		DVLRRT, //Directional variable length RRT algorithm.  Nodes keep track of epsilons for tested directions and infer epsilons for new directions
+		DVLERRT  //Directional variable length RRT algorithm with replanning  using waypoints.
 	}
 	
 	public static RRTsearch basicRRT(World w, int p, int baseLength) {
@@ -32,6 +61,14 @@ public class RRTsearch {
 	
 	public static RRTsearch VLERRT(World w, int pGoal, int baseLength, double baseEpsilon, int pWayPoint, List<Node> wayPoints) {
 		return new RRTsearch(w, pGoal, baseLength, baseEpsilon, wayPoints, pWayPoint, Algorithm.VLERRT);
+	}
+	
+	public static RRTsearch DVLRRT(World w, int p, int baseLength, double baseEpsilon) {
+		return new RRTsearch(w, p, baseLength, baseEpsilon, null, 0, Algorithm.DVLRRT);
+	}
+	
+	public static RRTsearch DVLERRT(World w, int pGoal, int baseLength, double baseEpsilon, int pWayPoint, List<Node> wayPoints) {
+		return new RRTsearch(w, pGoal, baseLength, baseEpsilon, wayPoints, pWayPoint, Algorithm.DVLERRT);
 	}
 	
 	//parameters
@@ -75,7 +112,20 @@ public class RRTsearch {
 	
 	
 	private void init() {
-		searchTree = new RRTtree(new RRTnode(w.start(),null,baseEpsilon));
+		Node initNode = null;
+		switch(type) {
+		case RRT:
+		case ERRT:
+			initNode = new RRTnode(w.start(), null, baseLength);
+		case VLRRT:
+		case VLERRT:
+			initNode = new VLRRTnode(w.start(), null, baseLength);
+		case DVLRRT:
+		case DVLERRT:
+			initNode = new DVLRRTnode(w.start(), null, baseLength);
+		}
+		
+		searchTree = new RRTtree(initNode);
 		r = new Random(System.currentTimeMillis());
 	}
 	
@@ -121,7 +171,6 @@ public class RRTsearch {
 	public boolean foundGoal() {
 		return done;
 	}
-
 	
 	private Node step(Stats stats) {
 		Point2D toward, destination;
@@ -141,7 +190,7 @@ public class RRTsearch {
 		
 		//find the Node to extend from
 		from = searchTree.closestTo(toward);
-		double extensionLength = from.getEpsilon()*baseLength;
+		double extensionLength = from.getExtensionLength(toward); //getEpsilon()*baseLength;
 		if(toGoal && from.getPoint().distance(toward) < extensionLength) {  //We can get to the goal this time...
 			destination = toward; //dest = the goal
 			reachGoal = true;
@@ -149,32 +198,19 @@ public class RRTsearch {
 		else destination = nextPoint(from.getPoint(), toward, extensionLength);
 		
 		if(w.collides(from.getPoint(), destination)) { //collision, decrease the
-			switch (type) { //extra functionality for VLRRT
-			case VLRRT: break;
-			case VLERRT:
-				decreaseEpsilon(from); break;
-			}
+			from.reportExtensionStatus(toward, false);
 			return null;
 		}
 		else {
 			if (reachGoal) done = true;  //didn't collide, will reach goal
-			double newEpsilon = baseEpsilon; //normal is the baseEpsilon (1 when not used)
-			switch (type) {
-			case VLRRT: break;
-			case VLERRT:
-				newEpsilon = increaseEpsilon(from); break;
-			}
+			from.reportExtensionStatus(toward, true);
 			stats.incTreeCoverage(RRTsearch.euclidianDistance(from.getPoint(), destination));
-			return new RRTnode(destination,from, newEpsilon);	
-		}
-		
-	
-		
+			return getNewNode(destination, from);	
+		}	
 	}
 	
 	private Point2D.Double nextPoint(Point2D origin, Point2D towards, double length) {
-
-		
+	
 		double xDelta,yDelta,hypotenuse;
 		double originX, originY, destinationX, destinationY;
 		double newXDelta, newYDelta;
@@ -204,15 +240,19 @@ public class RRTsearch {
 		return new Point2D.Double(newXCoord, newYCoord);	
 	}
 	
-	private void decreaseEpsilon(Node n) {
-		n.setEpsilon(n.getEpsilon() - .1);
-	}
-	
-	private double increaseEpsilon(Node n) {
-		double e = n.getEpsilon();
-		double newEpsilon = e + .1;
-		n.setEpsilon(newEpsilon);
-		return newEpsilon;
+	private Node getNewNode(Point2D point, Node parent) {
+		switch(type) {
+		case RRT:
+		case ERRT:
+			return new RRTnode(point, parent, baseLength);
+		case VLRRT:
+		case VLERRT:
+			return new VLRRTnode(point, (VLRRTnode) parent, baseLength);
+		case DVLRRT:
+		case DVLERRT:
+			return new DVLRRTnode(point, (DVLRRTnode) parent, baseLength);
+		}
+		return null;  //exception
 	}
 	
 }

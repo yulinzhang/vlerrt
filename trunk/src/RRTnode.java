@@ -1,24 +1,18 @@
 import java.awt.geom.Point2D;
 
-
+/*
+ * RRT always extend the same amount
+ */
 public class RRTnode implements Node {
 
-	private Node parent;
-	private Point2D pt;
-	private double epsilon;
+	protected Node parent;
+	protected Point2D pt;
+	protected double extLength;
 	
-	public RRTnode(Point2D pt, Node parent, double epsilon) {
+	public RRTnode(Point2D pt, Node parent, double baseLength) {
 		this.pt = pt;
 		this.parent = parent;
-		this.epsilon = epsilon;
-	}
-	
-	public double getEpsilon() {
-		return epsilon;
-	}
-
-	public void setEpsilon(double epsilon) {
-		this.epsilon = epsilon;
+		this.extLength = baseLength;
 	}
 	
 	public Node getParent() {
@@ -31,6 +25,14 @@ public class RRTnode implements Node {
 
 	public boolean isRoot() {
 		return parent == null;
+	}
+
+	public double getExtensionLength(Point2D to) {
+		return extLength;
+	}
+
+	public void reportExtensionStatus(Point2D to, boolean succeeded) {
+		//DO nothing
 	}
 
 }

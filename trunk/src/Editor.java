@@ -85,7 +85,7 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 				try {
 					final JFileChooser fc = new JFileChooser(new File("."));
 					fc.showSaveDialog(null);
-					file = fc.getSelectedFile().getName();
+					file = fc.getSelectedFile().getAbsolutePath();
 					world.write(file);
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -210,7 +210,7 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 		if( args.length < 1 ){
 			final JFileChooser fc = new JFileChooser(new File("."));
 			fc.showOpenDialog(null);
-			file = fc.getSelectedFile().getName();
+			file = fc.getSelectedFile().getAbsolutePath();
 		}else
 			file = args[0];
 		

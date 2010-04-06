@@ -98,11 +98,11 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 
 		menu.add(new AbstractAction("do search") {
 			public void actionPerformed(ActionEvent e) {
-					RRTsearch search = RRTsearch.basicRRT(world,20,10);
-					search.runSearch();
+					Testing search = new Testing(20, 10, 0, null, 1, world);
+					search.execNRuns(1,RRTsearch.Algorithm.RRT);
 					
 					JDialog dialog = new JDialog();
-					dialog.add(new GUI(world,search.getsearchTree()));
+					dialog.add(new GUI(world,search.getSearcher().getsearchTree()));
 					dialog.pack();
 					dialog.setVisible(true);
 			}

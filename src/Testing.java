@@ -215,7 +215,7 @@ public class Testing {
 
 	
 	
-	private void printStats() {
+	public void printStats() {
 		File f = new File("stats"+System.currentTimeMillis());
 		try {
 			FileWriter fwr = new FileWriter(f);

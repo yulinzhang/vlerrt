@@ -100,6 +100,7 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 			public void actionPerformed(ActionEvent e) {
 					Testing search = new Testing(20, 10, 0, null, 1, world);
 					search.execNRuns(1,RRTsearch.Algorithm.RRT);
+					search.printStats();
 					
 					JDialog dialog = new JDialog();
 					dialog.add(new GUI(world,search.getSearcher().getsearchTree()));

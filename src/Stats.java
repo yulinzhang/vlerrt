@@ -12,7 +12,8 @@ public class Stats {
 	private int baseLength;
 	private int pWayPoint;
 	private double baseEpsilon;
-	
+	private long initTime;
+	private long goalFTime;
 
 
 
@@ -20,6 +21,15 @@ public class Stats {
 	RRTsearch.Algorithm alg;
 	long runtime;
 
+	@Override
+	public String toString() {
+		return alg + " \t " + baseEpsilon + " \t " + baseLength + " \t "
+				+ gDistance + " \t " + goalFTime + " \t " + goalFound
+				+ " \t " + initTime + " \t " + nIterations + " \t " + nNodes
+				+ " \t " + pGoal + " \t " + pWayPoint + " \t " + runtime
+				+ " \t " + treeCoverage + " \t " + wHeight + " \t " + wWidth + " \t " + (gDistance/treeCoverage);
+	}
+	
 	public Stats() {}
 
 
@@ -36,6 +46,26 @@ public class Stats {
 		this.runtime = runtime;
 	}
 
+
+
+	public long getInitTime() {
+		return initTime;
+	}
+
+
+	public void setInitTime(long initTime) {
+		this.initTime = initTime;
+	}
+
+
+	public long getGoalFTime() {
+		return goalFTime;
+	}
+
+
+	public void setGoalFTime(long goalFTime) {
+		this.goalFTime = goalFTime;
+	}
 
 
 	public double getBaseEpsilon() {

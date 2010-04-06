@@ -3,48 +3,24 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 
-//
-//this is just for debug
-//
-
-
-////this is collision testing code
-//if( x!= null && y != null ){
-//	g.setColor( world.collides(x,y) ? Color.RED : Color.GREEN );
-//	g.draw(new Line2D.Double(x,y));
-//}
-//
-//
-//protected Point2D x,y;
-//
-//public void mouseClicked(MouseEvent e) {}
-//public void mouseEntered(MouseEvent e) {}
-//public void mouseExited (MouseEvent e) {}
-//public void mousePressed(MouseEvent e) {}
-//public void mouseReleased(MouseEvent e) {
-//	if( e.getButton() == MouseEvent.BUTTON1 )
-//		x = new Point2D.Double(e.getX(),e.getY());
-//	if( e.getButton()== MouseEvent.BUTTON3 )
-//		y = new Point2D.Double(e.getX(),e.getY());
-//	this.repaint();
-//}
 
 @SuppressWarnings("serial")
-public class Editor extends GUI implements MouseListener, MouseMotionListener, ComponentListener  {
+public class Editor extends GUI implements MouseListener, MouseMotionListener {
 
 	static final Color REALLY_LIGHT_GRAY = new Color(0.95f,0.95f,0.95f);
 	static final int SPACE = 40;
@@ -69,7 +45,6 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener, C
 		
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		addComponentListener(this);
 
 		m = Mode.NONE;
 		menu = new JPopupMenu();
@@ -101,9 +76,37 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener, C
 					world.write(file);
 				} catch (Exception e1) {
 					e1.printStackTrace();
-				}  }
+				}  
+			}
 		});
+		
+		menu.add(new AbstractAction("save as") {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					final JFileChooser fc = new JFileChooser(new File("."));
+					fc.showSaveDialog(null);
+					file = fc.getSelectedFile().getName();
+					world.write(file);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}  
+				repaint();	
+			}
+		});
+		
+		menu.addSeparator();
 
+		menu.add(new AbstractAction("do search") {
+			public void actionPerformed(ActionEvent e) {
+					RRTsearch search = RRTsearch.basicRRT(world,20,10);
+					search.runSearch();
+					
+					JDialog dialog = new JDialog();
+					dialog.add(new GUI(world,search.getsearchTree()));
+					dialog.pack();
+					dialog.setVisible(true);
+			}
+		});
 	}
 
 	public void draw(Graphics2D g, World world, Tree tree){
@@ -131,17 +134,10 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener, C
 			}
 		}
 
-		print(""+m+" @ "+world);
+		print("\'"+file+"\' "+m+" @ "+world);
 	}
 
-//	protected void print(Graphics2D g, String txt){
-//		g.setColor(Color.BLACK);
-//		g.drawString(txt, 0, getHeight()-50);
-//	}
-
-	protected void print(String txt){
-		
-	}
+	protected void print(String txt){ }
 	
 	protected void mark(Graphics2D g, int x, int y, Color c){
 		g.setColor(c);
@@ -210,10 +206,21 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener, C
 	}
 
 	public static void main(String[] args) throws Exception{
-		final JFrame frame = new JFrame("Editor");
+		String file = null;
+		if( args.length < 1 ){
+			final JFileChooser fc = new JFileChooser(new File("."));
+			fc.showOpenDialog(null);
+			file = fc.getSelectedFile().getName();
+		}else
+			file = args[0];
+		
+		if( file == null )
+			return;
+		
+		final JFrame frame = new JFrame();
 		frame.setLayout(new BorderLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new Editor("asd"){
+		frame.add(new Editor(file){
 			protected void print(String txt){
 				frame.setTitle(txt);
 			}
@@ -222,16 +229,31 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener, C
 		frame.setVisible(true);		
 	}
 
-	public void componentHidden(ComponentEvent e) { }
-
-	public void componentMoved(ComponentEvent e) { }
-
-	public void componentResized(ComponentEvent e) {
-//		System.out.println(e);
-	}
-
-	public void componentShown(ComponentEvent e) {
-		
-	}
 }
 
+
+//
+//this is just for debug
+//
+
+
+////this is collision testing code
+//if( x!= null && y != null ){
+//	g.setColor( world.collides(x,y) ? Color.RED : Color.GREEN );
+//	g.draw(new Line2D.Double(x,y));
+//}
+//
+//
+//protected Point2D x,y;
+//
+//public void mouseClicked(MouseEvent e) {}
+//public void mouseEntered(MouseEvent e) {}
+//public void mouseExited (MouseEvent e) {}
+//public void mousePressed(MouseEvent e) {}
+//public void mouseReleased(MouseEvent e) {
+//	if( e.getButton() == MouseEvent.BUTTON1 )
+//		x = new Point2D.Double(e.getX(),e.getY());
+//	if( e.getButton()== MouseEvent.BUTTON3 )
+//		y = new Point2D.Double(e.getX(),e.getY());
+//	this.repaint();
+//}

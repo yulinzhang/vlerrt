@@ -155,6 +155,7 @@ public class RRTsearch {
 	public int runSearchHalt(Stats stats) {
 		int nItrs = 0;
 		Node next = null;
+		stats.setInitTime(System.nanoTime());
 		while (!done && !halt) {
 			next = step(stats);
 			if (next != null) searchTree.add(next);
@@ -202,7 +203,10 @@ public class RRTsearch {
 			return null;
 		}
 		else {
-			if (reachGoal) done = true;  //didn't collide, will reach goal
+			if (reachGoal) {
+				done = true;  //didn't collide, will reach goal
+				stats.setGoalFTime(System.nanoTime());
+			}
 			from.reportExtensionStatus(toward, true);
 			stats.incTreeCoverage(RRTsearch.euclidianDistance(from.getPoint(), destination));
 			return getNewNode(destination, from);	
@@ -242,7 +246,7 @@ public class RRTsearch {
 	
 	private Node getNewNode(Point2D point, Node parent) {
 		switch(type) {
-		case RRT:
+		case RRT: 
 		case ERRT:
 			return new RRTnode(point, parent, baseLength);
 		case VLRRT:

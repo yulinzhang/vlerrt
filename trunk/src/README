@@ -6,7 +6,7 @@ World handling:
    - Preserving worlds between iterations.
    - Timer-based iterations...
    X Collisions with the world barriers.
-   - Maybe a simple (manual) world editor?
+   X Maybe a simple (manual) world editor?
    
    
  Distance update:

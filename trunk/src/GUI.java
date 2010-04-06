@@ -57,7 +57,7 @@ public class GUI extends JPanel {
 	static final protected Color GOAL = Color.GREEN;
 	static final protected Color START = Color.RED;
 	static final protected Color PATH = Color.BLUE;
-	static final protected Color ALL_PATH = Color.DARK_GRAY;
+	static final protected Color ALL_PATH = Color.PINK;
 
 	public GUI(World w, Tree t){
 		super();

@@ -27,7 +27,8 @@ public class Stats {
 				+ gDistance + " \t " + goalFTime + " \t " + goalFound
 				+ " \t " + initTime + " \t " + nIterations + " \t " + nNodes
 				+ " \t " + pGoal + " \t " + pWayPoint + " \t " + runtime
-				+ " \t " + treeCoverage + " \t " + wHeight + " \t " + wWidth + " \t " + (gDistance/treeCoverage);
+				+ " \t " + treeCoverage + " \t " + wHeight + " \t " + wWidth + " \t " + 
+				(gDistance/treeCoverage) + " \t " + (goalFTime-initTime);
 	}
 	
 	public Stats() {}

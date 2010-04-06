@@ -229,7 +229,7 @@ public class Testing {
 			Iterator<Stats> itr = stats.iterator();
 			fwr.write("Algorithm \t BaseEpsilon \t baseLength \t gDistance \t goalFTime \t" +
 					"goalFound \t initTime \t nIterations \t nNodes \t pGoal \t pWayPoint \t " +
-					"runtimeCap \t treeCoverage \t wHeight \t wWidth \t coverageRatio");
+					"runtimeCap \t treeCoverage \t wHeight \t wWidth \t coverageRatio \t TimeDelta\n");
 			while (itr.hasNext()) {
 				Stats s = itr.next();
 				fwr.write(s.toString()+"\n");

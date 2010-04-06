@@ -3,12 +3,18 @@ import java.awt.event.ActionListener;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import javax.swing.Timer;
+
 
 public class Testing { 
 	
@@ -26,6 +32,11 @@ public class Testing {
 	private double baseEpsilon;
 	
 	private List<Stats> stats;
+	
+	/* TODO: recording start time and goal find time  */
+	/* TODO: pretty print of information for graphing  */
+	
+	
 	
 	
 	class TestTask extends Thread {
@@ -107,7 +118,7 @@ public class Testing {
 		
 		
 		
-		TestTask task = new TestTask(searcher,100,stat);
+		TestTask task = new TestTask(searcher,20,stat);
 		task.start();
 		try {
 			task.join();
@@ -134,17 +145,12 @@ public class Testing {
 		System.out.println("Goal Distance: "+stat.getgDistance());
 		stat.setnNodes(searcher.getsearchTree().nNodes());
 		stats.add(stat); //Store for future processing.
-		
-		searcher.show();
-		
-		
-		searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
-		
-	
+				
+		//searcher.show();
 		
 		
-		
-		
+		//searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
+			
 		
 	}
 	
@@ -212,25 +218,53 @@ public class Testing {
 		
 	}
 	
+
 	
+	
+	private void printStats() {
+		File f = new File("stats"+System.currentTimeMillis());
+		try {
+			FileWriter fwr = new FileWriter(f);
+			
+			Iterator<Stats> itr = stats.iterator();
+			fwr.write("Algorithm \t BaseEpsilon \t baseLength \t gDistance \t goalFTime \t" +
+					"goalFound \t initTime \t nIterations \t nNodes \t pGoal \t pWayPoint \t " +
+					"runtimeCap \t treeCoverage \t wHeight \t wWidth \t coverageRatio");
+			while (itr.hasNext()) {
+				Stats s = itr.next();
+				fwr.write(s.toString()+"\n");
+			}
+			fwr.close();
+	
+		} catch (FileNotFoundException e) {
+			System.err.println("Bad file.");
+		} catch (IOException e) {
+			System.err.println("Error writing to file.");
+		}
+		
+	}
 	
 	private void execNRuns(int n, RRTsearch.Algorithm alg) {
 		
 		for (int i=0;i<n;i++) {
 			execSearch(alg);
-			changeWorld();
+			//changeWorld();
 		}
 		
 		
 		
 	}
 	
+	//Testing(int p, int baseLength, int pWayPoint, 
+	//	List<Node> wayPoints, double baseEpsilon, String testFile)  
+	//
 
 	public static void main(String[] args) {
-		Testing test = new Testing(20, 10, 0, null, 0, "asd");
+		Testing test = new Testing(20, 10, 0, null, 1, "asd"); //
 		
-		test.execNRuns(5,RRTsearch.Algorithm.RRT);
-
+		test.execNRuns(50,RRTsearch.Algorithm.RRT);
+		test.execNRuns(50, RRTsearch.Algorithm.VLRRT);
+		test.printStats();
 	}
 
 

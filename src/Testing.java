@@ -76,23 +76,17 @@ public class Testing {
 	}
 	
 	
-	public Testing(int p, int baseLength, int pWayPoint, List<Node> wayPoints, double baseEpsilon, String testFile)  {
-		
+	public Testing(int p, int baseLength, int pWayPoint, List<Node> wayPoints, double baseEpsilon, World world)  {
+
 		this.pGoal = p;
 		this.baseLength = baseLength;
 		this.pWayPoint = pWayPoint;
 		this.wayPoints = wayPoints;
 		this.baseEpsilon = baseEpsilon;
-		
+
 		this.stats = new LinkedList<Stats>();
-		
-		try {
-			this.world = new RRTWorld(testFile);
-		} catch (Exception e) {
-			// TODO Treat the FNF better.
-			e.printStackTrace();
-		}
-		
+		this.world = world;
+
 	}
 	
 	
@@ -244,7 +238,7 @@ public class Testing {
 		
 	}
 	
-	private void execNRuns(int n, RRTsearch.Algorithm alg) {
+	public void execNRuns(int n, RRTsearch.Algorithm alg) {
 		
 		for (int i=0;i<n;i++) {
 			execSearch(alg);
@@ -255,12 +249,16 @@ public class Testing {
 		
 	}
 	
+	public RRTsearch getSearcher(){
+		return this.searcher;
+	}
+	
 	//Testing(int p, int baseLength, int pWayPoint, 
 	//	List<Node> wayPoints, double baseEpsilon, String testFile)  
 	//
 
-	public static void main(String[] args) {
-		Testing test = new Testing(20, 10, 0, null, 1, "asd"); //
+	public static void main(String[] args) throws Exception{
+		Testing test = new Testing(20, 10, 0, null, 1, new RRTWorld("asd")); //
 		
 		test.execNRuns(50,RRTsearch.Algorithm.RRT);
 		test.execNRuns(50, RRTsearch.Algorithm.VLRRT);

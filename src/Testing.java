@@ -1,11 +1,9 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
@@ -108,6 +106,8 @@ public class Testing {
 			case RRT : setupBasicRRT(); break;
 			case VLRRT : setupVLRRT(); break;
 			case VLERRT : setupVLERRT(); break;
+			case DVLRRT : setupDVLRRT(); break;
+			case DVLERRT : setupDVLERRT(); break;
 		}
 		
 		
@@ -161,6 +161,14 @@ public class Testing {
 	}
 	
 	private void setupVLERRT() {
+		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, baseEpsilon, pWayPoint, wayPoints);
+	}
+	
+	private void setupDVLRRT() {
+		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, baseEpsilon);
+	}
+	
+	private void setupDVLERRT() {
 		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, baseEpsilon, pWayPoint, wayPoints);
 	}
 
@@ -261,7 +269,8 @@ public class Testing {
 		Testing test = new Testing(20, 10, 0, null, 1, new RRTWorld("asd")); //
 		
 		test.execNRuns(50,RRTsearch.Algorithm.RRT);
-		test.execNRuns(50, RRTsearch.Algorithm.VLRRT);
+		test.execNRuns(50,RRTsearch.Algorithm.VLRRT);
+		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT);
 		test.printStats();
 	}
 

@@ -1,4 +1,3 @@
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -25,6 +24,9 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 	static final Color REALLY_LIGHT_GRAY = new Color(0.95f,0.95f,0.95f);
 	static final int SPACE = 40;
 
+	static final int WTF_W = 7;
+	static final int WTF_H = 7;
+	
 	enum Mode {
 		NONE,
 		NEW_OBSTACLE_PT1,
@@ -102,7 +104,8 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 					Testing search = new Testing(50,20, 10, 0, null, 1, world);
 
 					search.execNRuns(1,RRTsearch.Algorithm.RRT);
-					search.printStats("editorOut",false);
+
+					search.printStats("editorOut",false);//FIXME: halting bug.
 					
 					JDialog dialog = new JDialog();
 					dialog.add(new GUI(world,search.getSearcher().getsearchTree()));
@@ -148,12 +151,18 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 		g.drawLine(x-2,y+2,x+2,y-2);
 	}
 
+	protected Point2D wtfMouse(MouseEvent e){
+//		System.out.println( this.getBounds() +" "+ e.getPoint());
+
+		return new Point2D.Double(e.getX()-WTF_W, e.getY()-WTF_H);	
+	}
+
 	public void mouseClicked(MouseEvent e) { }
 	public void mouseEntered(MouseEvent e) { }
 	public void mouseExited(MouseEvent e) { }
 	public void mousePressed(MouseEvent e) { }
 	public void mouseReleased(MouseEvent e) {
-		point = new Point2D.Double(e.getX(), e.getY());
+		point = wtfMouse(e);
 		
 		if( e.getButton() == MouseEvent.BUTTON1 ){
 			switch(m){
@@ -164,7 +173,6 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 				((RRTWorld)world).start = point;
 				break;
 			case DELETE_OBSTACLE:
-				//FIXME: buggy! origins is incorrect!
 				List<Rectangle2D> list = ((RRTWorld)world).obstacles;
 				Iterator<Rectangle2D> it = list.iterator();
 				while( it.hasNext() ){
@@ -197,13 +205,13 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 		}
 
 		if(e.getButton() == MouseEvent.BUTTON3)
-			menu.show(this, e.getX(), e.getY());
+			menu.show(this, e.getX()-WTF_W, e.getY()-WTF_H);
 	}
 
 	public void mouseDragged(MouseEvent e) { }
 	public void mouseMoved(MouseEvent e) { 
 		if( m == Mode.NEW_OBSTACLE_PT2 || m == Mode.DELETE_OBSTACLE ){
-			point = new Point2D.Double(e.getX(), e.getY());
+			point = wtfMouse(e);
 			repaint();
 		}
 	}
@@ -221,14 +229,15 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 			return;
 		
 		final JFrame frame = new JFrame();
-		frame.setLayout(new BorderLayout());
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new Editor(file){
+		final Editor editor = new Editor(file){
 			protected void print(String txt){
 				frame.setTitle(txt);
 			}
-		},BorderLayout.CENTER);
+		};
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(editor);
 		frame.pack();
+		frame.setResizable(false); //avoids problems with mouse clicks.
 		frame.setVisible(true);		
 	}
 

@@ -31,6 +31,8 @@ public class Testing {
 	protected VLRRTnode.changeEpsilonScheme dec = VLRRTnode.changeEpsilonScheme.Linear;
 	protected double decFactor = .1;
 	
+	private int runtime;
+	
 	private List<Stats> stats;
 	
 	/* TODO: recording start time and goal find time  */
@@ -76,7 +78,9 @@ public class Testing {
 	}
 	
 	
-	public Testing(int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world)  {
+
+	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, double baseEpsilon, World world)  {
+
 
 		this.pGoal = p;
 		this.baseLength = baseLength;
@@ -85,12 +89,45 @@ public class Testing {
 
 		this.stats = new LinkedList<Stats>();
 		this.world = world;
+		this.runtime = runtime;
 
 	}
+
+	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world)  {
+
+
+		this.pGoal = p;
+		this.baseLength = baseLength;
+		this.pWayPoint = pWayPoint;
+		this.wayPoints = wayPoints;
+
+		this.stats = new LinkedList<Stats>();
+		this.world = world;
+		this.runtime = runtime;
+
+	}
+
+	public Testing( int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world)  {
+
+
+		this.pGoal = p;
+		this.baseLength = baseLength;
+		this.pWayPoint = pWayPoint;
+		this.wayPoints = wayPoints;
+
+		this.stats = new LinkedList<Stats>();
+		this.world = world;
+		this.runtime = 50;
+
+	}
+
+	
 	
 	public Testing(int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world,
 	VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-		this(p, baseLength, pWayPoint, wayPoints, world);
+		this(50,p, baseLength, pWayPoint, wayPoints, world);
+		this.inc = inc;
+		this.dec = dec;
 		
 		
 	}
@@ -118,7 +155,7 @@ public class Testing {
 		
 		
 		
-		TestTask task = new TestTask(searcher,20,stat);
+		TestTask task = new TestTask(searcher,runtime,stat);
 		task.start();
 		try {
 			task.join();
@@ -267,7 +304,7 @@ public class Testing {
 			execSearch(alg,printToScreen);
 			//changeWorld();
 		}
-		
+		searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
 		
 		
 	}
@@ -280,18 +317,21 @@ public class Testing {
 		return this.searcher;
 	}
 	
-	//Testing(int p, int baseLength, int pWayPoint, 
+	//Testing(int runtimelimit, int p, int baseLength, int pWayPoint, 
 	//	List<Node> wayPoints, double baseEpsilon, String testFile)  
 	//
 
 	public static void main(String[] args) throws Exception{
-		Testing test = new Testing(20, 10, 0, null, new RRTWorld("asd")); //
+
+		Testing test = new Testing(50,20, 10, 0, null, 1, new RRTWorld("worlds/big_barrier")); //
+
 		
 		test.execNRuns(50,RRTsearch.Algorithm.RRT);
 		test.execNRuns(50,RRTsearch.Algorithm.VLRRT);
 		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT);
 		test.printStats("statsADS", true);
 	}
+	
 
 
 

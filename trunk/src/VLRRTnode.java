@@ -8,19 +8,30 @@ public class VLRRTnode extends RRTnode {
 	//Enum to keep track of how to change Epsilon
 	protected enum changeEpsilonScheme {
 		Linear,  //increase/decrease epislon by a fixed amount 
-		Double,  //double/halve epsilon
-		Restart  //reset to 1
+		Mult,  //multiply/divide by a factor
+		Restart;  //reset to 1
+
 	}
 	
 	private double epsilon;
 	protected changeEpsilonScheme inc = changeEpsilonScheme.Linear;
+	protected double incFactor = .1;
 	protected changeEpsilonScheme dec = changeEpsilonScheme.Linear;
-	
+	protected double decFactor = .1;
 	
 	public VLRRTnode(Point2D pt, VLRRTnode parent, double extLength) {
 		super(pt, parent, extLength);
 		if (parent != null) this.epsilon = parent.epsilon;  //copy Epsilon from parent
 		else epsilon = 1;  //default 1
+	}
+	
+	public VLRRTnode(Point2D pt, VLRRTnode parent, double extLength, 
+			changeEpsilonScheme inc, double incFactor,changeEpsilonScheme dec, double decFactor) {
+		this(pt, parent, extLength);
+		this.dec = dec;
+		this.decFactor = decFactor;
+		this.inc = inc;
+		this.incFactor = incFactor;
 	}
 	
 	public Node getParent() {
@@ -51,7 +62,7 @@ public class VLRRTnode extends RRTnode {
 		case Linear:
 			if (epsilon > .1 ) return epsilon - .1;  //don't decrease past .1
 			return epsilon;
-		case Double:
+		case Mult:
 			if (epsilon > .1 ) return epsilon/2; //don't decrease past .1
 			return epsilon;
 		case Restart:
@@ -64,7 +75,7 @@ public class VLRRTnode extends RRTnode {
 		switch (inc) {
 		case Linear:
 			return epsilon + .1;
-		case Double:
+		case Mult:
 			return epsilon*2; 
 		case Restart:
 			return 1; 

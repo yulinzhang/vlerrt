@@ -13,7 +13,6 @@ import java.util.Random;
 
 import javax.swing.Timer;
 
-
 public class Testing { 
 	
 /* Class for testing and evaluating the RRT algorithms */
@@ -27,7 +26,10 @@ public class Testing {
 	private int baseLength;
 	private int pWayPoint;
 	private List<Node> wayPoints;
-	private double baseEpsilon;
+	protected VLRRTnode.changeEpsilonScheme inc = VLRRTnode.changeEpsilonScheme.Linear;
+	protected double incFactor = .1;
+	protected VLRRTnode.changeEpsilonScheme dec = VLRRTnode.changeEpsilonScheme.Linear;
+	protected double decFactor = .1;
 	
 	private List<Stats> stats;
 	
@@ -64,7 +66,7 @@ public class Testing {
 			long rtime = System.currentTimeMillis() - t0;
 			stats.setRuntime(rtime);
 			stats.setnIterations(nItrs);
-			System.out.println("Search has halted in "+rtime);
+			//System.out.println("Search has halted in "+rtime);
 		
 		}
 		
@@ -74,21 +76,26 @@ public class Testing {
 	}
 	
 	
-	public Testing(int p, int baseLength, int pWayPoint, List<Node> wayPoints, double baseEpsilon, World world)  {
+	public Testing(int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world)  {
 
 		this.pGoal = p;
 		this.baseLength = baseLength;
 		this.pWayPoint = pWayPoint;
 		this.wayPoints = wayPoints;
-		this.baseEpsilon = baseEpsilon;
 
 		this.stats = new LinkedList<Stats>();
 		this.world = world;
 
 	}
 	
+	public Testing(int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world,
+	VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
+		this(p, baseLength, pWayPoint, wayPoints, world);
+		
+		
+	}
 	
-	private void execSearch(RRTsearch.Algorithm alg) {
+	private void execSearch(RRTsearch.Algorithm alg, boolean printToScreen) {
 		
 		
 		Stats stat = new Stats();
@@ -98,7 +105,6 @@ public class Testing {
 		stat.setBaseLength(baseLength);
 		stat.setpGoal(pGoal);
 		stat.setpWayPoint(pWayPoint);
-		stat.setBaseEpsilon(baseEpsilon);
 				
 		
 		switch (alg) {
@@ -135,8 +141,10 @@ public class Testing {
 			}
 			
 		}
-		System.out.println("World Coverage: "+stat.getTreeCoverage());
-		System.out.println("Goal Distance: "+stat.getgDistance());
+		if (printToScreen) {
+			System.out.println("World Coverage: "+stat.getTreeCoverage());
+			System.out.println("Goal Distance: "+stat.getgDistance());
+		}
 		stat.setnNodes(searcher.getsearchTree().nNodes());
 		stats.add(stat); //Store for future processing.
 				
@@ -157,19 +165,19 @@ public class Testing {
 	}
 	
 	private void setupVLRRT() {
-		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, baseEpsilon);
+		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor);
 	}
 	
 	private void setupVLERRT() {
-		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, baseEpsilon, pWayPoint, wayPoints);
+		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor);
 	}
 	
 	private void setupDVLRRT() {
-		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, baseEpsilon);
+		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor);
 	}
 	
 	private void setupDVLERRT() {
-		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, baseEpsilon, pWayPoint, wayPoints);
+		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor);
 	}
 
 	
@@ -222,14 +230,17 @@ public class Testing {
 	
 
 	
-	
-	public void printStats() {
-		File f = new File("stats"+System.currentTimeMillis());
+	//output to the stats directory
+	public void printStats(String outputFile, boolean includeTime) {
+		String fileName = "runStats/" + outputFile;
+		if (includeTime) fileName = fileName+System.currentTimeMillis();
+		
+		File f = new File(fileName);
 		try {
 			FileWriter fwr = new FileWriter(f);
 			
 			Iterator<Stats> itr = stats.iterator();
-			fwr.write("Algorithm \t BaseEpsilon \t baseLength \t gDistance \t goalFTime \t" +
+			fwr.write("Algorithm \t baseLength \t gDistance \t goalFTime \t" +
 					"goalFound \t initTime \t nIterations \t nNodes \t pGoal \t pWayPoint \t " +
 					"runtimeCap \t treeCoverage \t wHeight \t wWidth \t coverageRatio \t TimeDelta\n");
 			while (itr.hasNext()) {
@@ -246,15 +257,23 @@ public class Testing {
 		
 	}
 	
-	public void execNRuns(int n, RRTsearch.Algorithm alg) {
+	public List<Stats> getStats() {
+		return stats;
+	}
+	
+	public void execNRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen) {
 		
 		for (int i=0;i<n;i++) {
-			execSearch(alg);
+			execSearch(alg,printToScreen);
 			//changeWorld();
 		}
 		
 		
 		
+	}
+	
+	public void execNRuns(int n, RRTsearch.Algorithm alg) {
+		execNRuns(n, alg, false);
 	}
 	
 	public RRTsearch getSearcher(){
@@ -266,12 +285,12 @@ public class Testing {
 	//
 
 	public static void main(String[] args) throws Exception{
-		Testing test = new Testing(20, 10, 0, null, 1, new RRTWorld("asd")); //
+		Testing test = new Testing(20, 10, 0, null, new RRTWorld("asd")); //
 		
 		test.execNRuns(50,RRTsearch.Algorithm.RRT);
 		test.execNRuns(50,RRTsearch.Algorithm.VLRRT);
 		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT);
-		test.printStats();
+		test.printStats("statsADS", true);
 	}
 
 

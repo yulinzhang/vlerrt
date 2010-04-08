@@ -2,7 +2,6 @@ import java.awt.geom.Point2D;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-
 /*
  * Directional Variable Length RRT node
  * keep track not only of how far to be extending based on past successes/failures
@@ -133,7 +132,7 @@ public class DVLRRTnode extends VLRRTnode {
 	
 	public DVLRRTnode(Point2D pt, DVLRRTnode parent, double extLength) {
 		super(pt, parent, extLength);
-		
+		dec = changeEpsilonScheme.Restart;
 		//initially add each direction at Epsilon for this successful extension
 		dirEpsilon = new DirectionalEpsilonMap();
 		if (parent != null) {
@@ -144,7 +143,15 @@ public class DVLRRTnode extends VLRRTnode {
 			dirEpsilon.setEpsilon(angleToParent, initialEpsilon);
 		}
 	}
-
+	public DVLRRTnode(Point2D pt, DVLRRTnode parent, double extLength,
+			changeEpsilonScheme inc, double incFactor,changeEpsilonScheme dec, double decFactor) {
+		this(pt, parent, extLength);
+		this.dec = dec;
+		this.decFactor = decFactor;
+		this.inc = inc;
+		this.incFactor = incFactor;
+	}
+	
 	/*
 	 * compute the angle using arcTan and converting to the 0 <= angle < 2*pi range
 	 */

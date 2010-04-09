@@ -1,4 +1,4 @@
-\documentclass[11pt,twoside,twocolumn]{article}
+\documentclass[10pt,twoside,twocolumn]{article}
 
 \usepackage{project}
 
@@ -14,9 +14,9 @@
 
 \section{Introduction}
 
-[Where is RRT useful? Needed? Continuous etc. not optimal solution...]
+The RRT algorithm represents an extreme in the design space of planning algorithms.  It gives up the goal of optimality and attempt by brute randomness and a small bias towards the goal to explore the space and find a path.  This is in marked contrast to other planning algorithms such as visibility graphs  or voronoi diagrams which carefully analyze and partition the space to find paths.  This difference makes RRT very efficient even in higher dimensional spaces because its computational overhead is small in comparison to other algorithms which attempt to precisely characterize the world.  However, this also means that RRT does not take advantage of information that it learns about the world while exploring.
 
-Our project is centered on the observation that the fixed extension length used in the RRT\cite{Bruce02real-timerandomized} family of algorithms may not be adequate for all kinds of environments. In particular, we note that for RRT to be effective, the extension length must be calibrated to the particular environment that a robot is trying to plan in. In Figure [SIMPLER FIGURE?], for example, the narrow passages in the wall means that the extension length must be small.  However, this goes against one of the strengths of the RRT algorithm which is that global reasoning about the environment is not necessary. That is, as long as a map can tell us if a given vector is obstacle free, we should not be required to discover or reason about global properties of the world.
+The central idea of our project is to introduce learning of the environment into the RRT algorithm for online use in the search and also for re-planning purposes.  We focus our efforts on the extension length for two reasons.  First, the RRT algorithm gets information about good and bad extension lengths from given points when it tests to see if a given extension fails.  Second, the optimal extension length varies based on the obstacles surrounding a given point.  The goal of this project is to extend the RRT planning and the ERRT re-planning algorithm to store and use information learned about good extension lengths while searching the space.  Our hope is that we can realize significant improvements in how fast and often RRT-based planning finds the goal without sacrificing its efficiency.
 
 \paragraph{Goal}
 Our goal is to explore a set of variations in the standard RRT (and ERRT) algorithms to try to offer a better algorithm for these heterogeneous worlds both in a single iteration and re-planning.
@@ -71,8 +71,18 @@ Next we present our current metrics:
 \end{description}
 
 \section{Preliminary Results}
+initial results suggest that
+\begin{enumerate}
+\item our algorithm explores a bigger percent of the worlds.
+\item In worlds where all algorithms find the goal, our enhanced algorithms found the goal faster.
+\item But our algorithms do not perform as well on our
+\end{enumerate}
 
-Borked.
+[table showing success rates]
+
+[table showing world exploration on failure]
+
+[table showing time to goal on success]
 
 \section{Progress So Far}
 

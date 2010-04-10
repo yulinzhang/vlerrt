@@ -12,97 +12,154 @@
 
 \maketitle
 
-\section{Introduction}
+\section{Introduction} 
+The RRT algorithm represents an extreme in the design space of planning algorithms.  
+It forsakes the optimality and explores the space through randomness and a small bias towards goals.  This is in marked contrast to other planning strategies such as visibility graphs or voronoi diagrams which carefully analyze and partition the space to find paths.  
+This difference makes RRT very efficient even in higher dimensional spaces because its computational overhead is small in comparison to other algorithms which attempt to precisely characterize the world.  However, this also means that RRT does not take advantage of information that it learns about the world while exploring.
 
-The RRT algorithm represents an extreme in the design space of planning algorithms.  It gives up the goal of optimality and attempt by brute randomness and a small bias towards the goal to explore the space and find a path.  This is in marked contrast to other planning algorithms such as visibility graphs  or voronoi diagrams which carefully analyze and partition the space to find paths.  This difference makes RRT very efficient even in higher dimensional spaces because its computational overhead is small in comparison to other algorithms which attempt to precisely characterize the world.  However, this also means that RRT does not take advantage of information that it learns about the world while exploring.
+The central idea of our project is to introduce learning of the environment into the RRT algorithm for online use in the search and also for re-planning purposes.  We focus our efforts on the extension length for two reasons.  First, the RRT algorithm gets information about good and bad extension lengths from given points when it tests to see if a given extension fails.  Second, the optimal extension length varies based on the obstacles surrounding a given point.  The goal of this project is to extend the RRT planning and the ERRT re-planning algorithm to store and use information learned about good extension lengths while searching the space.  Our hope is that we can realize significant improvements in how fast and often RRT-based planning finds the goal, without sacrificing its key principles.
 
-The central idea of our project is to introduce learning of the environment into the RRT algorithm for online use in the search and also for re-planning purposes.  We focus our efforts on the extension length for two reasons.  First, the RRT algorithm gets information about good and bad extension lengths from given points when it tests to see if a given extension fails.  Second, the optimal extension length varies based on the obstacles surrounding a given point.  The goal of this project is to extend the RRT planning and the ERRT re-planning algorithm to store and use information learned about good extension lengths while searching the space.  Our hope is that we can realize significant improvements in how fast and often RRT-based planning finds the goal without sacrificing its efficiency.
-
-\paragraph{Goal}
-Our goal is to explore a set of variations in the standard RRT (and ERRT) algorithms to try to offer a better algorithm for these heterogeneous worlds both in a single iteration and re-planning.
-
-%We intend to each be responsible for developing one of these parts of the project. However, given that all the parts are interconnected, each of us
-%will naturally contribute to all components of the project.
+Our main goal is to explore a set of variations in the standard RRT (and ERRT) algorithms to try and offer a better algorithm for these heterogeneous worlds both in planning and re-planning scenarios.
 
 \paragraph{Related Work}
 
 Some other papers describing extensions to the RRT algorithm which may be helpful include \cite{Lavalle98rapidly-exploringrandom},\cite{Lindemann04incrementallyreducing},\cite{Jaillet05adaptivetuning}, and \cite{moplan2009}.
 
-[TODO: expand?]
 
 \section{RRT Algorithms}
 
-[ Basic idea of RRT, core algorithm. ]
+A Rapidly-exploring Random Tree (RRT) algorithm is a random algorithm designed for efficient search in
+continuous spaces. The algorithm finds a path from a start point $S$ to a goal $G$ in a given search space 
+by generating a random tree in the space. The tree will have $S$ as its root and is computed by randomly
+choosing points in the world, finding the tree node $N$ closest to the random point and extending the tree by
+creating a new node $N'$ connected to $N$, in the direction of the random point (as long as the extension does not
+intersect any obstacles in the world). 
 
-[ Standard Biased RRT pseudo code. ]
+An immediate optimization to the algorithm in terms of path planning, called RRT-GoalBias, consists of adding a probability
+parameter $p$, which causes the algorithm to choose to extend the tree towards the goal with probability $p$,
+and extend towards a random point with probability $1-p$. 
 
-One potential way to address this issue is to allow the length of the expansion distance to change over the course of the (re)planning. 
-Our idea is that associating an extension factor with each point in the random tree provides information that can be used to
-improve both RRT planning and re-planning. 
-The basic planning algorithm would behave something like this:
-\begin{enumerate}
-\item Choose a random point in the world and find the nearest point in the plan tree
-\item Choose an extension distance based on the extension factor of this point
-\item if the expansion fails (there was an obstacle), decrease the point's extension factor and go-to (1)
-\item if the expansion succeeds, increase the start point's extension factor and set the extension factor of the new node in the tree with the factor of the previous old point.
-\end{enumerate}
-We hypothesize that this would allow for the RRT algorithm to better handle heterogeneous spaces because it could accelerate across open spaces with larger steps, but navigate through constrained spaces as well. Furthermore, the extension factor information can be used to inform a re-planning procedure. Since the extension factor is a function of how obstructed the world
-around a point is, we can use this information to approximate the set of the unobstructed regions of the world and further improve
-our successive plans (i.e. if we select a point in the tree that falls into a large unobstructed region, we probably can afford larger extensions from that point).
+The main advantages of using a RRT algorithm are that it does not require a discretization of the space and the high
+efficiency in terms of time and space usage. Furthermore, it turns out that such a biased random exploration of the space
+does indeed prove to be successful in finding paths, even in the presence of a large number of obstacles. Such positive
+results have resulted in the usage of RRT for robot motion planning and re-planning (in the latter setting, information
+about previous paths is also used to bias the search).
 
 \subsection{Context Sensitivity}
+Consider now a realistic scenario where the space in which we desire to plan has a high number of obstacles, possibly 
+non-uniformly distributed throughout the world.
+Such a world will have regions which will be fairly open, in which should be easy to find a path, and regions which will
+be more cluttered and therefore harder to navigate through. The way RRT is used to find paths in such worlds, simply relies
+on lowering the probability $p$ and the extension length. The first aims to avoid being stuck in the obstructed regions of the world,
+while the latter aims to allow for extensions to succeed in these regions. Unfortunately, lowering these parameters naturally
+decreases overall performance, since the algorithm extends less often towards the goal, and requires more extensions 
+(and therefore more computation) to actually reach it, even in regions of the space where such a conservative approach may not be required.
 
-\subsubsection{DVLRRT}
+Our observation is that RRT does not take advantage of the information it collects about the world, and therefore always employs a
+rigid exploration tactic that needs to be globally conservative to succeed in the scenario above. However, it should be possible to use
+the information collected throughout the exploration to adapt the tree generation procedure in such a way that the tree will cover
+the less obstructed regions of space faster (in terms of computation time and number of nodes), all the while maintaining the ability
+ to navigate through the more obstructed areas.
+%
+We address this issue by allowing the extension lengths between nodes to change over the course of the 
+tree generation in such a way that the extension length becomes higher in open areas and lower in cluttered ones. Our basic framework
+is as follows: we associate with each node in the tree an extension factor, which is used to determine the extension length that is to be
+applied to all extensions from the node. Whenever an extension from a node fails, we decrease it's extension factor. 
+When an extension succeeds, we increase the node's extension factor, generate the new node which will inherit the extension factor of its parent.
+
+The idea is that we should always try to eagerly maximize the extension length, in order to cover space as fast as possible, therefore
+as long as extensions succeed (and therefore the algorithm does not run into obstacles) it keeps increasing the extension length accordingly.
+When the algorithm cannot extend from a node, it means that an obstacle exists in the proximity of that node and therefore the extension
+length should decrease accordingly, to potentially increase the success of navigating through.
 
 \subsubsection{VLRRT}
 
+Variable Length RRT (VLRRT) is an algorithm that follows immediately in our framework. With each node of the tree,
+we associate a value $\epsilon$ which is used as a multiplicative factor to the base extension length. For the root of the
+tree, the value of $\epsilon$ starts off as $1$. As in standard RRT-GoalBias, the algorithm is parametrized with a probability of
+extending towards the goal. The main difference lies in the treatment of the actual extensions. Whenever an extension from a given
+node succeeds, we increase its $\epsilon$ value and generate the new node with the new $\epsilon$ value of its parent, in order to
+propagate the extension information throughout the tree. Whenever an extension fails, we decrease the $\epsilon$ value of the node.
+
+A natural question arises in this scenario, which is how to vary the $\epsilon$ value in the presence of successful and unsuccessful 
+extensions. Therefore, we opted to parametrize the algorithm with three possible schemes with which to increase and/or decrease $\epsilon$:
+a \emph{linear} scheme, in which $\epsilon$ increases/decreases a fixed amount; a \emph{multiplicative} scheme, in which $\epsilon$ is multiplied or divided by a fixed amount, and a \emph{restart} scheme, in which $\epsilon$ is restarted to its initial value of $1$.
+
+\subsubsection{DVLRRT}
+An immediate observation regarding VLRRT is that a successful or unsuccessful extension provides us information of the
+presence or absence of obstacles in a particular direction, but not in all directions (which is the generalization that VLRRT employs). 
+While such an over-generalization may indeed provide good results (which indeed turns out to be the case), it is clear that there
+will be scenarios where $\epsilon$ will increase/decrease when perhaps it didn't need to. To take the extension idea one step
+further, we developed Directional VLRRT (DVLRRT).
+
+The idea behind DVLRRT is to account directionality into VLRRT's $\epsilon$ value modifications, in order to overcome the potential
+downsides of the generalization employed in VLRRT. In each tree node, we store a \emph{directional $\epsilon$ map}. This 
+structure maps a particular direction with an epsilon value, which enables us to take into account directions when updating $\epsilon$
+and computing extension lengths.
+
+Whenever we attempt to extend from a node in a given direction $d$, we check if a mapping with that particular direction exists in the directional map.
+If so, we use the epsilon value stored in the map to compute the extension length and update it on failure/success as in VLRRT. If the mapping does not yet exist, we compute the $\epsilon$ value for the given direction by taking into account the directional information in the map: we look up directions similar to $d$ up to a certain angular distance, clockwise and counter-clockwise, and weight the information by proximity to $d$. We update the directional map with the $\epsilon$ value for $d$ on extension success/failure accordingly.
+
+With this new strategy, we inform our extension length variation even further, by taking into account extension success and failure in directions that are similar to ones we have observed before in a node.
+
+
 \section{Evaluating the algorithms}
 
-{\it Testing and performance metrics:} To evaluate the performance of our algorithm, we will implement a test suite (with visualization) that will allow us to measure the performance of our re-planner (in successful plans to the goal and number of steps in a plan) in several types of randomly generated worlds (worlds with uniform distributions of obstacles, non-uniform, etc.), as well as compare its performance to that of ERRT in the same
-scenarios.
+To evaluate the performance of our algorithms, we implemented a simulation suite (with visualization) that allows
+us to compare DVLRRT, VLRRT and RRT-GoalBias. The suite is also prepared for re-planning simulation, by simulating
+random changes in worlds in successive iterations.
 
-In order to compare our modification, we had to define a set of metrics not only to measure the case of when the goal is reached but also the quality of the search when it is not found.
+Our testing suite executes the specified algorithms (with a given time limit for each execution) in a number of previously
+generated worlds and records relevant statistics such as time spent to find the goal, path length, world coverage, etc.
 
-Next we present our current metrics:
-\begin{description}
-\item[iterations to goal] number of iterations that the algorithm takes to reach the goal;
-\item[distance travelled] the span/length of the tree
-\item[point density] something on the concentration of the points?
-\end{description}
+The metrics we used to compare DVLRRT, VLRRT and RRT-GoalBias for this report are success rate (in terms of finding the goal) and running
+time. For DVLRRT and VLRRT, we also analyzed how the several $\epsilon$ modification schemes affect overall performance.
 
-\section{Preliminary Results}
-initial results suggest that
-\begin{enumerate}
-\item our algorithm explores a bigger percent of the worlds.
-\item In worlds where all algorithms find the goal, our enhanced algorithms found the goal faster.
-\item But our algorithms do not perform as well on our
-\end{enumerate}
+\section{Preliminary Results} %100 or 50?
 
+We executed each algorithm 100 times, in several representative worlds, with a time limit of 50 milliseconds: 
+a maze-like world (similar to the one in CITE), a largely unobstructed world with a particularly obstructed region in
+the path to the goal and a globally cluttered world.
+
+We can immediately observe that in all the test worlds, our algorithms perform generally better than RRT-GoalBias,
+frequently achieving higher average success rates and lower average execution times. However, and not unexpectedly,
+that is not the case for all $\epsilon$ modification schemes. 
+
+Our intuition is that we want to ``speed through'' what we consider to be unobstructed regions, but decrease our
+``speed'' as fast as possible when we find an obstructed region, so we can effectively navigate through it. As it turns
+out, our intuition is indeed correct, seeing as the modification schemes that perform the best are those that
+increase $\epsilon$ faster but decrease $\epsilon$ even faster, in both VLRRT and DVLRRT. Not surprisingly,
+DVLRRT performs better than VLRRT in such configurations, since VLRRT can more easily over-generalize what it
+considers to be an obstructed or an unobstructed region. Note that even if both increase and decrease schemes are
+linear, both our algorithms still outperform RRT-GoalBias (more noticeably in execution time than success rate). This
+confirms that even the over-approximation of VLRRT still turns out to be better than the static nature of RRT-GoalBias.
+
+Finally, our preliminary results further increase our confidence that our approach does indeed produce effective gains in
+planning and that exploiting the gathered information for re-planning purposes should increase the performance gains
+even further.
+
+%Talk about the "bad ones"
 [table showing success rates]
 
 [table showing world exploration on failure]
 
 [table showing time to goal on success]
 
-\section{Progress So Far}
+\section{Current Progress and Future Steps}
 
-So far, we have fulfilled the following objectives:
+We have successfully implemented and evaluated two strategies that improve RRT-GoalBias by
+taking into account information about the world during planning. We will now
+direct our efforts into using the collected information to further improve performance
+in re-planning scenarios (in comparison to ERRT). 
 
-\begin{enumerate}
-\item {\it The basic algorithm:}  Designing and coding the basic algorithm for a single iteration will be an important piece of the project.  Determining the best way to increment and decrement the extension factor will be an interesting challenge.  Furthermore, it may well be that the simple algorithm outlined above will not work perfectly.  However, we may be able to enhance it with ideas such as associating directions with our extension factor (i.e only increase it when heading in the same or similar direction), by including the expansion multiplier in the determination of the closest point, or another scheme.
+Our claim is that if the information we collect
+about the world does indeed produce good results, then we should be able to incorporate that
+information in subsequent executions (i.e re-planning) by extrapolating the unobstructed regions of
+the world from the $\epsilon$ values of the previous executions. A possible way to do this can be
+to generate the regions using a K-Nearest Neighbors algorithm. Under the reasonable assumption
+that the world doesn't change too much between executions, we can use the region information to
+\emph{a priori} inform the $\epsilon$ values of points that fall within said regions.
 
-\end{enumerate}
-
-
-\section{Future Steps}
-
-We plan to continue our project with the following:
-\begin{itemize}
-\item Integrate replanning ERRT.
-\item improve the algorithm (voronoi?) play with parameters.
-\item {\it Applying the gathered information to re-planning:} Apart from implementing the waypoints already used in ERRT, this portion of the project entails developing a way of extrapolating from the the several regions that make up the world and finding appropriate ways of using these regions as input to the extension factor changes (as summarized above). Another important part of this component is finding out how to adjust these regions, as the number of planning iterations increases and we obtain more information.
-\item evaluate in extreme world...?
-\end{itemize}
 
 \bibliography{AIbib}{}
 \bibliographystyle{alpha}

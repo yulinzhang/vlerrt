@@ -13,12 +13,12 @@ public class RRTsearch {
 		}
 
 		
-		RRTsearch search = basicRRT(testWorld,20,10);
+		RRTsearch search = VLRRT(testWorld,20,10);
 		search.runSearch();
 		search.show();
 
 		try {
-			testWorld = new RRTWorld("worlds/proposal-world");
+			testWorld = new RRTWorld("worlds/RRTpaper-world");
 		} catch (Exception e) {
 			testWorld = new RRTWorld(400,400);
 		}
@@ -28,7 +28,7 @@ public class RRTsearch {
 		searchVLRRT.show();
 		
 		try {
-			testWorld = new RRTWorld("worlds/proposal-world");
+			testWorld = new RRTWorld("worlds/cluttered");
 		} catch (Exception e) {
 			testWorld = new RRTWorld(400,400);
 		}
@@ -73,22 +73,22 @@ public class RRTsearch {
 
 	public static RRTsearch VLRRT(World w, int p, int baseLength, 
 			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-		return new RRTsearch(w, p, baseLength, null, 0, Algorithm.VLRRT);
+		return new RRTsearch(w, p, baseLength, null, 0, Algorithm.VLRRT, inc, incFactor, dec, decFactor);
 	}
 	
 	public static RRTsearch VLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, 
 			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-		return new RRTsearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT);
+		return new RRTsearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT, inc, incFactor, dec, decFactor);
 	}
 	
 	public static RRTsearch DVLRRT(World w, int p, int baseLength, 
 			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-		return new RRTsearch(w, p, baseLength, null, 0, Algorithm.DVLRRT);
+		return new RRTsearch(w, p, baseLength, null, 0, Algorithm.DVLRRT, inc, incFactor, dec, decFactor);
 	}
 	
 	public static RRTsearch DVLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, 
 			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-		return new RRTsearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.DVLERRT);
+		return new RRTsearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.DVLERRT, inc, incFactor, dec, decFactor);
 	}
 	
 	
@@ -130,7 +130,8 @@ public class RRTsearch {
 	
 	public RRTsearch(World w, int pGoal, int baseLength,
 			List<Node> wayPoints, int pWayPoint, Algorithm type, 
-			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,
+			VLRRTnode.changeEpsilonScheme dec, double decFactor) {
 		this.pGoal = pGoal;
 		this.w = w;
 		this.baseLength = baseLength;
@@ -157,13 +158,13 @@ public class RRTsearch {
 		switch(type) {
 		case RRT:
 		case ERRT:
-			initNode = new RRTnode(w.start(), null, baseLength);
+			initNode = new RRTnode(w.start(), null, baseLength); break;
 		case VLRRT:
 		case VLERRT:
-			initNode = new VLRRTnode(w.start(), null, baseLength, inc, incFactor, dec, decFactor);
+			initNode = new VLRRTnode(w.start(), null, baseLength, inc, incFactor, dec, decFactor); break;
 		case DVLRRT:
 		case DVLERRT:
-			initNode = new DVLRRTnode(w.start(), null, baseLength, inc, incFactor, dec, decFactor);
+			initNode = new DVLRRTnode(w.start(), null, baseLength, inc, incFactor, dec, decFactor); break;
 		}
 		
 		searchTree = new RRTtree(initNode);
@@ -187,7 +188,7 @@ public class RRTsearch {
 	
 	public void runSearch() {
 		Node next = null;
-		for (int count = 1; count < 100 && !done; count++){
+		for (int count = 1; count < 1200 && !done; count++){
 			next = step(new Stats()); //Dummy
 			if (next != null) searchTree.add(next);
 		}
@@ -292,10 +293,10 @@ public class RRTsearch {
 			return new RRTnode(point, parent, baseLength);
 		case VLRRT:
 		case VLERRT:
-			return new VLRRTnode(point, (VLRRTnode) parent, baseLength);
+			return new VLRRTnode(point, (VLRRTnode) parent, baseLength, inc, incFactor, dec, decFactor);
 		case DVLRRT:
 		case DVLERRT:
-			return new DVLRRTnode(point, (DVLRRTnode) parent, baseLength);
+			return new DVLRRTnode(point, (DVLRRTnode) parent, baseLength, inc, incFactor, dec, decFactor);
 		}
 		return null;  //exception
 	}

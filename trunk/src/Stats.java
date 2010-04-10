@@ -60,6 +60,10 @@ public class Stats {
 	public long getGoalFTime() {
 		return goalFTime;
 	}
+	
+	public long getElapsedTime() {
+		return goalFTime-initTime;
+	}
 
 
 	public void setGoalFTime(long goalFTime) {

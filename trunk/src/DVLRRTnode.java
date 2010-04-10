@@ -132,7 +132,7 @@ public class DVLRRTnode extends VLRRTnode {
 	
 	public DVLRRTnode(Point2D pt, DVLRRTnode parent, double extLength) {
 		super(pt, parent, extLength);
-		dec = changeEpsilonScheme.Restart;
+		//dec = changeEpsilonScheme.Restart;
 		//initially add each direction at Epsilon for this successful extension
 		dirEpsilon = new DirectionalEpsilonMap();
 		if (parent != null) {

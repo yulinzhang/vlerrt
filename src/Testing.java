@@ -132,6 +132,15 @@ public class Testing {
 		
 	}
 	
+	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world,
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
+				this(runtime,p, baseLength, pWayPoint, wayPoints, world);
+				this.inc = inc;
+				this.dec = dec;
+				
+				
+			}
+	
 	private void execSearch(RRTsearch.Algorithm alg, boolean printToScreen) {
 		
 		
@@ -304,7 +313,8 @@ public class Testing {
 			execSearch(alg,printToScreen);
 			//changeWorld();
 		}
-		searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
+		if (printToScreen) 
+			searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
 		
 		
 	}

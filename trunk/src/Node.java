@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 public interface Node {
 	Point2D getPoint();
 	Node getParent();
+	void setParent(Node parent);
 	boolean isRoot();
 	/**
 	 * 

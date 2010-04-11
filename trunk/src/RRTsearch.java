@@ -13,29 +13,68 @@ public class RRTsearch {
 		}
 
 		
-		RRTsearch search = VLRRT(testWorld,20,10);
+		RRTsearch search = basicRRT(testWorld,20,10,false);
 		search.runSearch();
-		search.show();
+		search.show("RRT");
+		
+		try {
+			testWorld = new RRTWorld("worlds/proposal-world");
+		} catch (Exception e) {
+			testWorld = new RRTWorld(400,400);
+		}
+
+		
+		RRTsearch searchO = basicRRT(testWorld,20,10,true);
+		searchO.runSearch();
+		searchO.show("RRT-O");
+		
+		try {
+			testWorld = new RRTWorld("worlds/proposal-world");
+		} catch (Exception e) {
+			testWorld = new RRTWorld(400,400);
+		}
+
+		
+		RRTsearch searchV = VLRRT(testWorld,20,10,VLRRTnode.changeEpsilonScheme.Mult, 2, 
+									VLRRTnode.changeEpsilonScheme.Restart,1, false);
+		searchV.runSearch();
+		searchV.show("VLRRT");
+		
+		try {
+			testWorld = new RRTWorld("worlds/proposal-world");
+		} catch (Exception e) {
+			testWorld = new RRTWorld(400,400);
+		}
+
+		
+		RRTsearch searchVO = VLRRT(testWorld,20,10,VLRRTnode.changeEpsilonScheme.Mult, 2, 
+				VLRRTnode.changeEpsilonScheme.Restart,1, true);
+		searchVO.runSearch();
+		searchVO.show("VLRRT-O");
 
 		try {
-			testWorld = new RRTWorld("worlds/RRTpaper-world");
+			testWorld = new RRTWorld("worlds/proposal-world");
 		} catch (Exception e) {
 			testWorld = new RRTWorld(400,400);
 		}
+
 		
-		RRTsearch searchVLRRT = VLRRT(testWorld,20,10);
-		searchVLRRT.runSearch();
-		searchVLRRT.show();
+		RRTsearch searchD = DVLRRT(testWorld,20,10,VLRRTnode.changeEpsilonScheme.Mult, 2, 
+									VLRRTnode.changeEpsilonScheme.Restart,1, false);
+		searchD.runSearch();
+		searchD.show("DVLRRT");
 		
 		try {
-			testWorld = new RRTWorld("worlds/cluttered");
+			testWorld = new RRTWorld("worlds/proposal-world");
 		} catch (Exception e) {
 			testWorld = new RRTWorld(400,400);
 		}
+
 		
-		RRTsearch searchDVLRRT = DVLRRT(testWorld,20,10);
-		searchDVLRRT.runSearch();
-		searchDVLRRT.show();
+		RRTsearch searchDO = DVLRRT(testWorld,20,10,VLRRTnode.changeEpsilonScheme.Mult, 2, 
+				VLRRTnode.changeEpsilonScheme.Restart,1, true);
+		searchDO.runSearch();
+		searchDO.show("DVLRRT-O");
 	}
 	
 	public enum Algorithm {
@@ -91,6 +130,35 @@ public class RRTsearch {
 		return new RRTsearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.DVLERRT, inc, incFactor, dec, decFactor);
 	}
 	
+	//Optimization parameters
+	public static RRTsearch basicRRT(World w, int p, int baseLength, boolean optimize) {
+		return new RRTsearch(w, p, baseLength, null, 0, Algorithm.RRT, null, 0 ,null, 0, optimize);
+	}
+	
+	public static RRTsearch ERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, boolean optimize) {
+		return new RRTsearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.ERRT, null, 0, null, 0, optimize);
+	}
+	
+	public static RRTsearch VLRRT(World w, int p, int baseLength, 
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize) {
+		return new RRTsearch(w, p, baseLength, null, 0, Algorithm.VLRRT, inc, incFactor, dec, decFactor, optimize);
+	}
+	
+	public static RRTsearch VLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, 
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize) {
+		return new RRTsearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT, inc, incFactor, dec, decFactor, optimize);
+	}
+	
+	public static RRTsearch DVLRRT(World w, int p, int baseLength, 
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize) {
+		return new RRTsearch(w, p, baseLength, null, 0, Algorithm.DVLRRT, inc, incFactor, dec, decFactor, optimize);
+	}
+	
+	public static RRTsearch DVLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, 
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize) {
+		return new RRTsearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.DVLERRT, inc, incFactor, dec, decFactor, optimize);
+	}
+	
 	
 	//parameters
 	private World w;  //world to search in (includes start and goal points)
@@ -108,6 +176,8 @@ public class RRTsearch {
 	private Tree searchTree;
 	private boolean done = false;
 	private boolean halt = false;
+	
+	private boolean optimize = false;
 	
 	public RRTsearch() {
 		w = new RRTWorld(400,400);	
@@ -132,6 +202,16 @@ public class RRTsearch {
 			List<Node> wayPoints, int pWayPoint, Algorithm type, 
 			VLRRTnode.changeEpsilonScheme inc, double incFactor,
 			VLRRTnode.changeEpsilonScheme dec, double decFactor) {
+		this (w, pGoal, baseLength, wayPoints, pWayPoint, 
+				type, inc, incFactor, dec, decFactor, false);
+		
+	}
+	
+	public RRTsearch(World w, int pGoal, int baseLength,
+			List<Node> wayPoints, int pWayPoint, Algorithm type, 
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,
+			VLRRTnode.changeEpsilonScheme dec, double decFactor,
+			boolean optimize) {
 		this.pGoal = pGoal;
 		this.w = w;
 		this.baseLength = baseLength;
@@ -142,6 +222,7 @@ public class RRTsearch {
 		this.decFactor = decFactor;
 		this.inc = inc;
 		this.incFactor = incFactor;
+		this.optimize = optimize;
 		init();
 		
 	}
@@ -177,6 +258,11 @@ public class RRTsearch {
 	
 	public void show(){
 		GUI.display(w, searchTree, "RRTWorld");
+//		GUI.screenshot(w, searchTree, "asd");	
+	}
+	
+	public void show(String title){
+		GUI.display(w, searchTree, title);
 //		GUI.screenshot(w, searchTree, "asd");	
 	}
 	
@@ -234,9 +320,9 @@ public class RRTsearch {
 		//find the Node to extend from
 		from = searchTree.closestTo(toward);
 		double extensionLength = from.getExtensionLength(toward); //getEpsilon()*baseLength;
-		if(toGoal && from.getPoint().distance(toward) < extensionLength) {  //We can get to the goal this time...
-			destination = toward; //dest = the goal
-			reachGoal = true;
+		if(from.getPoint().distance(toward) < extensionLength) {  //We can get to the point we are extending towards
+			destination = toward; //dest = the point
+			if (toGoal) reachGoal = true;  //in fact, it is the goal and we might be done!
 		}
 		else destination = nextPoint(from.getPoint(), toward, extensionLength);
 		
@@ -245,13 +331,16 @@ public class RRTsearch {
 			return null;
 		}
 		else {
+			Node ret = getNewNode(destination, from);
+			
 			if (reachGoal) {
 				done = true;  //didn't collide, will reach goal
 				stats.setGoalFTime(System.nanoTime());
+				if (optimize) optimizePath(ret);
 			}
 			from.reportExtensionStatus(toward, true);
 			stats.incTreeCoverage(RRTsearch.euclidianDistance(from.getPoint(), destination));
-			return getNewNode(destination, from);	
+			return ret;
 		}	
 	}
 	
@@ -299,6 +388,25 @@ public class RRTsearch {
 			return new DVLRRTnode(point, (DVLRRTnode) parent, baseLength, inc, incFactor, dec, decFactor);
 		}
 		return null;  //exception
+	}
+	
+	private void optimizePath(Node n) {
+		Node start = n;
+		Node optimized, current;
+		
+		do {
+			current = start.getParent();
+			optimized = current;
+			
+			
+			while (optimized.getParent() != null &&  //loop until reached root
+					!w.collides(start.getPoint(), optimized.getParent().getPoint())) {  //or path between start and candidate not clear
+				optimized = optimized.getParent();
+			}
+			if (optimized != current) start.setParent(optimized);
+			
+			start = start.getParent();  //next node to try to optimize
+		} while (start.getParent() != null);	
 	}
 	
 }

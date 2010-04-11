@@ -18,6 +18,10 @@ public class RRTnode implements Node {
 	public Node getParent() {
 		return parent;
 	}
+	
+	public void setParent(Node parent) {
+		this.parent = parent;
+	}
 
 	public Point2D getPoint() {
 		return pt;
@@ -34,5 +38,5 @@ public class RRTnode implements Node {
 	public void reportExtensionStatus(Point2D to, boolean succeeded) {
 		//DO nothing
 	}
-
+	
 }

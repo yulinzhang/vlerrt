@@ -176,8 +176,9 @@ public class Testing {
 		stat.setGoalFound(gFound);
 		
 		if (gFound) { //Goal to root distance in the tree
-			Tree tree = searcher.getsearchTree();
-			Node goal = tree.closestTo(world.goal());
+		
+			Node goal = stat.getGoal();
+		
 			while( !goal.isRoot() ){
 				Node parent_node = goal.getParent();
 				Point2D leaf = goal.getPoint();
@@ -185,6 +186,8 @@ public class Testing {
 				stat.incgDistance(RRTsearch.euclidianDistance(parent, leaf));
 				goal = parent_node;
 			}
+			
+			stat.setGoal(null);
 			
 		}
 		if (printToScreen) {
@@ -297,6 +300,7 @@ public class Testing {
 	
 		} catch (FileNotFoundException e) {
 			System.err.println("Bad file.");
+			e.printStackTrace();
 		} catch (IOException e) {
 			System.err.println("Error writing to file.");
 		}
@@ -315,6 +319,7 @@ public class Testing {
 		}
 		if (printToScreen) 
 			searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
+
 		
 		
 	}
@@ -336,10 +341,34 @@ public class Testing {
 		Testing test = new Testing(50,20, 10, 0, null, 1, new RRTWorld("worlds/big_barrier")); //
 
 		
+		test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
+		test.execNRuns(50,RRTsearch.Algorithm.VLRRT,true);
+		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT,true);
+		test.printStats("stats_bb_50_20_10_", true);
+		
+		/*test = new Testing(50,40, 15, 0, null, 1, new RRTWorld("worlds/big_barrier_redux")); //
+
+		
 		test.execNRuns(50,RRTsearch.Algorithm.RRT);
 		test.execNRuns(50,RRTsearch.Algorithm.VLRRT);
 		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT);
-		test.printStats("statsADS", true);
+		test.printStats("stats_bbr_40_15_20_", true);
+		
+		test = new Testing(50,40, 15, 0, null, 1, new RRTWorld("worlds/mazzy")); //
+
+		
+		test.execNRuns(50,RRTsearch.Algorithm.RRT);
+		test.execNRuns(50,RRTsearch.Algorithm.VLRRT);
+		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT);
+		test.printStats("stats_mazzy_40_15_20_", true);
+		
+		test = new Testing(50,40, 15, 0, null, 1, new RRTWorld("worlds/tiny_passage")); //
+
+		
+		test.execNRuns(50,RRTsearch.Algorithm.RRT);
+		test.execNRuns(50,RRTsearch.Algorithm.VLRRT);
+		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT);
+		test.printStats("stats_tp_40_15_20_", true);*/
 	}
 	
 

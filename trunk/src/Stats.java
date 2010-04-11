@@ -6,6 +6,7 @@ public class Stats {
 	private boolean goalFound;
 	private double gDistance;
 	private double treeCoverage;
+	private Node goal;
 	private int wHeight;
 	private int wWidth;
 	private int pGoal;
@@ -208,6 +209,14 @@ public class Stats {
 
 	public long getRuntime() {
 		return runtime;
+	}
+
+	public void setGoal(Node goal) {
+		this.goal = goal;
+	}
+
+	public Node getGoal() {
+		return goal;
 	}	
 	
 	

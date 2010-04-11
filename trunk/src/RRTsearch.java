@@ -336,6 +336,7 @@ public class RRTsearch {
 			if (reachGoal) {
 				done = true;  //didn't collide, will reach goal
 				stats.setGoalFTime(System.nanoTime());
+				stats.setGoal(ret);
 				if (optimize) optimizePath(ret);
 			}
 			from.reportExtensionStatus(toward, true);

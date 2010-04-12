@@ -19,18 +19,18 @@ public class Testing {
 	
 	private final double PROB_CHANGE_OBSTACLE = 0.2;
 	
-	private World world;
 	private RRTsearch searcher;
 	
+	private World world;
 	private int pGoal;
 	private int baseLength;
 	private int pWayPoint;
 	private List<Node> wayPoints;
-	protected VLRRTnode.changeEpsilonScheme inc = VLRRTnode.changeEpsilonScheme.Linear;
-	protected double incFactor = .1;
-	protected VLRRTnode.changeEpsilonScheme dec = VLRRTnode.changeEpsilonScheme.Linear;
-	protected double decFactor = .1;
-	
+	protected VLRRTnode.changeEpsilonScheme inc; //= VLRRTnode.changeEpsilonScheme.Linear;
+	protected double incFactor;// = .1;
+	protected VLRRTnode.changeEpsilonScheme dec;// = VLRRTnode.changeEpsilonScheme.Linear;
+	protected double decFactor;// = .1;
+	private boolean optimize;// = false;
 	private int runtime;
 	
 	private List<Stats> stats;
@@ -72,73 +72,64 @@ public class Testing {
 		
 		}
 		
-
-	
-		
-	}
-	
-	
-
-	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, double baseEpsilon, World world)  {
-
-
-		this.pGoal = p;
-		this.baseLength = baseLength;
-		this.pWayPoint = pWayPoint;
-		this.wayPoints = wayPoints;
-
-		this.stats = new LinkedList<Stats>();
-		this.world = world;
-		this.runtime = runtime;
-
 	}
 
+	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world, boolean optimize)  {
+		this(runtime, p, baseLength, pWayPoint, wayPoints, world, optimize, 
+				VLRRTnode.changeEpsilonScheme.Linear, .1, VLRRTnode.changeEpsilonScheme.Linear, .1);
+
+	}
+	
 	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world)  {
-
-
-		this.pGoal = p;
-		this.baseLength = baseLength;
-		this.pWayPoint = pWayPoint;
-		this.wayPoints = wayPoints;
-
-		this.stats = new LinkedList<Stats>();
-		this.world = world;
-		this.runtime = runtime;
+		this(runtime, p, baseLength, pWayPoint, wayPoints, world, false, 
+				VLRRTnode.changeEpsilonScheme.Linear, .1, VLRRTnode.changeEpsilonScheme.Linear, .1);
 
 	}
 
 	public Testing( int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world)  {
-
-
-		this.pGoal = p;
-		this.baseLength = baseLength;
-		this.pWayPoint = pWayPoint;
-		this.wayPoints = wayPoints;
-
-		this.stats = new LinkedList<Stats>();
-		this.world = world;
-		this.runtime = 50;
-
+		this(50, p, baseLength, pWayPoint, wayPoints, world, false, 
+				VLRRTnode.changeEpsilonScheme.Linear, .1, VLRRTnode.changeEpsilonScheme.Linear, .1);
 	}
 
-	
+	public Testing( int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world, boolean optimize)  {
+		this(50, p, baseLength, pWayPoint, wayPoints, world, optimize, 
+				VLRRTnode.changeEpsilonScheme.Linear, .1, VLRRTnode.changeEpsilonScheme.Linear, .1);
+	}
 	
 	public Testing(int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world,
 	VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-		this(50,p, baseLength, pWayPoint, wayPoints, world);
-		this.inc = inc;
-		this.dec = dec;
-		
-		
+		this(50, p, baseLength, pWayPoint, wayPoints, world, false, 
+				inc, incFactor, dec, decFactor);		
 	}
+	
+	public Testing(int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world, boolean optimize,
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
+				this(50, p, baseLength, pWayPoint, wayPoints, world, optimize, 
+						inc, incFactor, dec, decFactor);		
+			}
 	
 	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world,
 			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-				this(runtime,p, baseLength, pWayPoint, wayPoints, world);
+				this(runtime, p, baseLength, pWayPoint, wayPoints, world, false, 
+				inc, incFactor, dec, decFactor);
+
+			}
+	
+	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world, boolean optimize,
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
 				this.inc = inc;
 				this.dec = dec;
-				
-				
+				this.incFactor = incFactor;
+				this.decFactor = decFactor;
+				this.pGoal = p;
+				this.baseLength = baseLength;
+				this.pWayPoint = pWayPoint;
+				this.wayPoints = wayPoints;
+
+				this.stats = new LinkedList<Stats>();
+				this.world = world;
+				this.runtime = runtime;
+				this.optimize = optimize;
 			}
 	
 	private void execSearch(RRTsearch.Algorithm alg, boolean printToScreen) {
@@ -206,27 +197,27 @@ public class Testing {
 	}
 	
 	private void setupBasicRRT() {
-		this.searcher = RRTsearch.basicRRT(world, pGoal, baseLength);
+		this.searcher = RRTsearch.basicRRT(world, pGoal, baseLength, optimize);
 	}
 	
 	private void setupERRT() {
-		this.searcher = RRTsearch.ERRT(world, pGoal, baseLength, pWayPoint, wayPoints);
+		this.searcher = RRTsearch.ERRT(world, pGoal, baseLength, pWayPoint, wayPoints, optimize);
 	}
 	
 	private void setupVLRRT() {
-		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor);
+		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor, optimize);
 	}
 	
 	private void setupVLERRT() {
-		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor);
+		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize);
 	}
 	
 	private void setupDVLRRT() {
-		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor);
+		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor, optimize);
 	}
 	
 	private void setupDVLERRT() {
-		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor);
+		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize);
 	}
 
 	
@@ -338,7 +329,7 @@ public class Testing {
 
 	public static void main(String[] args) throws Exception{
 
-		Testing test = new Testing(50,20, 10, 0, null, 1, new RRTWorld("worlds/big_barrier")); //
+		Testing test = new Testing(50,20, 10, 0, null, new RRTWorld("worlds/big_barrier")); //
 
 		
 		test.execNRuns(50,RRTsearch.Algorithm.RRT,true);

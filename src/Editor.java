@@ -101,7 +101,7 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 		menu.add(new AbstractAction("do search") {
 			public void actionPerformed(ActionEvent e) {
 
-					Testing search = new Testing(50,20, 10, 0, null, 1, world);
+					Testing search = new Testing(50,20, 10, 0, null, world);
 
 					search.execNRuns(1,RRTsearch.Algorithm.RRT);
 

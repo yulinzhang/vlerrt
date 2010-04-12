@@ -11,15 +11,13 @@ public class RRTtree implements Tree {
 	private KDTree<Double,GenericPoint<Double>,Node> theTree;
 	private Node root;
 	private NearestNeighbors<Double,GenericPoint<Double>,Node> neighborQuery;
-	
-	
-	
-	
+
 	public RRTtree(Node root) {
 		this.root = root;
 		theTree = new KDTree<Double,GenericPoint<Double>,Node>(2);
 		add(root);
 		neighborQuery = new NearestNeighbors<Double,GenericPoint<Double>,Node>();  //Euclidean distance neighbor search
+
 	}
 	
 	
@@ -29,8 +27,12 @@ public class RRTtree implements Tree {
 	}
 
 	public Node closestTo(Point2D pt) {
+		//see if the actual point is there
+		GenericPoint<Double> ptRep = new GenericPoint<Double>(pt.getX(), pt.getY());
+		if (theTree.containsKey(ptRep)) return theTree.get(ptRep);
+		
 		Entry<Double,GenericPoint<Double>,Node>[] neighbors = 
-			neighborQuery.get(theTree, new GenericPoint<Double>(pt.getX(),pt.getY()), 1);
+			neighborQuery.get(theTree, ptRep, 1);
 		if (neighbors.length > 0) {
 			return neighbors[0].getNeighbor().getValue();
 		} else return null; 

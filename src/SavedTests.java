@@ -32,7 +32,19 @@ public class SavedTests {
 		for(int i = 0; i < args.length; i++){
 			world = args[i];
 			
-			test = new Testing(50,20, 10, 0, null, new RRTWorld(world),
+			test = new Testing(50,20, 10, 0, null, new RRTWorld(world), true, 
+					inc, incFactor, dec, decFactor); //
+			
+			test.execNRuns(1,RRTsearch.Algorithm.RRT,true);
+			test.execNRuns(1,RRTsearch.Algorithm.VLRRT,true);
+			test.execNRuns(1,RRTsearch.Algorithm.DVLRRT,true);
+			test.printStats("stats_" + world.substring(7) + "_O",true);
+		}
+		
+		for(int i = 0; i < args.length; i++){
+			world = args[i];
+			
+			test = new Testing(50,20, 10, 0, null, new RRTWorld(world), false, 
 					inc, incFactor, dec, decFactor); //
 			
 			test.execNRuns(1,RRTsearch.Algorithm.RRT,true);
@@ -62,55 +74,49 @@ public class SavedTests {
 	
 	private static void testEpsilonChangeSchemes(String[] worlds) throws Exception {
 		
-		//List<FileWriter> files = new ArrayList<FileWriter>();
-		//Map<FileWriter,ResultSetData> fwToRes = new HashMap<FileWriter, ResultSetData>();
+
 		Map<VLRRTnode.changeEpsilonScheme,List<Double>> tests = constructTests();
 		List<RRTsearch.Algorithm> algs = new ArrayList<RRTsearch.Algorithm>();
 		algs.add(RRTsearch.Algorithm.VLRRT);
 		algs.add(RRTsearch.Algorithm.DVLRRT);	
-		//double results;
+
 		ResultSetData results;
 		String prefix = "changeSchemeTests";
 		
 		File f = new File(prefix + System.currentTimeMillis());
-//		File success = new File(prefix + "_success" + System.currentTimeMillis());
-//		File dist = new File(prefix + "_distance" + System.currentTimeMillis());
-//		File time = new File(prefix + "_time" + System.currentTimeMillis());
-//		File coverage = new File(prefix + "_coverage" + System.currentTimeMillis());
-//		File nodes = new File(prefix + "_nodes" + System.currentTimeMillis());
+
 		
 		
 		try {
-//			FileWriter successFwr = new FileWriter(success);
-//			FileWriter distFwr = new FileWriter(dist);
-//			FileWriter timeFwr = new FileWriter(time);
-//			FileWriter coverageFwr = new FileWriter(coverage);
-//			FileWriter nodesFwr = new FileWriter(nodes);
-//			files.add(successFwr);
-//			files.add(distFwr);
-//			files.add(timeFwr);
-//			files.add(coverageFwr);
-//			files.add(nodesFwr);
+
 			FileWriter fwr = new FileWriter(f);
 			
 			
-			//header
-			//for (FileWriter fwr : files) {
+
 				fwr.write("Algorithm" + sep + "IncScheme" + sep + "incFactor" + sep + "decScheme" + sep + "decFactor");
 				for (int w = 0; w < worlds.length; w++) fwr.write(sep + worlds[w].substring(7) + sep + sep);
 				fwr.write("\n");
-			//}
-			//basic RRT
-			//for (FileWriter fwr : files) {
+
 				fwr.write("" + RRTsearch.Algorithm.RRT + sep + 0 + sep + 0 + sep + 0 + sep + 0); //header
-			//}
-				for (int w = 0; w < worlds.length; w++) {
-					results = testScheme(RRTsearch.Algorithm.RRT, worlds[w], null, 0, null, 0); 
+
+				for (int w = 0; w < worlds.length; w++) { //not optimized
+					results = testScheme(RRTsearch.Algorithm.RRT, worlds[w], false, null, 0, null, 0); 
 					fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
 				}
-			//for (FileWriter fwr : files) {	
+	
 				fwr.write("\n");
-			//}
+				
+				fwr.write("" + RRTsearch.Algorithm.RRT + "_O" + sep + 0 + sep + 0 + sep + 0 + sep + 0); //header
+
+				for (int w = 0; w < worlds.length; w++) { //optimized
+					results = testScheme(RRTsearch.Algorithm.RRT, worlds[w], true, null, 0, null, 0); 
+					fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
+				}
+	
+				fwr.write("\n");
+				
+				
+
 			
 			for (VLRRTnode.changeEpsilonScheme incScheme : tests.keySet()) {
 				for (VLRRTnode.changeEpsilonScheme decScheme : tests.keySet()) {
@@ -119,7 +125,16 @@ public class SavedTests {
 							for (RRTsearch.Algorithm alg : algs) { //line for each alg/change scheme combination
 								fwr.write("" + alg + sep + incScheme + sep + incFactor + sep + decScheme + sep + decFactor); //header
 								for (int w = 0; w < worlds.length; w++) {
-									results = testScheme(alg, worlds[w], incScheme, incFactor, decScheme, decFactor);
+									results = testScheme(alg, worlds[w], false, incScheme, incFactor, decScheme, decFactor);
+									//fwr.write(sep + results);
+									fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
+									System.out.println(results);
+								}
+								fwr.write("\n");
+								
+								fwr.write("" + alg + "_0" + sep + incScheme + sep + incFactor + sep + decScheme + sep + decFactor); //header
+								for (int w = 0; w < worlds.length; w++) {
+									results = testScheme(alg, worlds[w], true, incScheme, incFactor, decScheme, decFactor);
 									//fwr.write(sep + results);
 									fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
 									System.out.println(results);
@@ -139,26 +154,9 @@ public class SavedTests {
 
 	}
 	
-//	private static double testScheme(RRTsearch.Algorithm alg, String world, VLRRTnode.changeEpsilonScheme inc, double incFactor, 
-//		VLRRTnode.changeEpsilonScheme dec, double decFactor) throws Exception {
-//		Testing test = new Testing(20,10,0,null,new RRTWorld(world),inc,incFactor,dec,decFactor);
-//		test.execNRuns(100, alg);
-//		double percent = getPercentSuccess(test.getStats());
-//		return percent;
-//	}
-//	
-//	private static double getPercentSuccess(List<Stats> theData) {
-//		double successes = 0;
-//		for (Stats s : theData) {
-//			if (s.isGoalFound()) successes++;
-//		}
-//		
-//		return (successes)/(theData.size());
-//	}
-	
-	private static ResultSetData testScheme(RRTsearch.Algorithm alg, String world, VLRRTnode.changeEpsilonScheme inc, double incFactor, 
-											VLRRTnode.changeEpsilonScheme dec, double decFactor) throws Exception {
-		Testing test = new Testing(20,10,0,null,new RRTWorld(world),inc,incFactor,dec,decFactor);
+	private static ResultSetData testScheme(RRTsearch.Algorithm alg, String world, boolean optimize, 
+			VLRRTnode.changeEpsilonScheme inc, double incFactor, VLRRTnode.changeEpsilonScheme dec, double decFactor) throws Exception {
+		Testing test = new Testing(20,10,0,null,new RRTWorld(world), optimize ,inc,incFactor,dec,decFactor);
 		test.execNRuns(100, alg);
 		ResultSetData data = getData(test.getStats());
 		return data;		
@@ -199,13 +197,13 @@ public class SavedTests {
 		Map<VLRRTnode.changeEpsilonScheme,List<Double>> ret = new HashMap<VLRRTnode.changeEpsilonScheme,List<Double>>();
 		
 		List<Double> linearFactors = new ArrayList<Double>();
-		//for(double factor = .1;  factor < 2; factor += .2) linearFactors.add(factor);
-		linearFactors.add(.1);
+		for(double factor = .1;  factor < 2; factor += .2) linearFactors.add(factor);
+		//linearFactors.add(.1);
 		ret.put(VLRRTnode.changeEpsilonScheme.Linear, linearFactors);
 		
 		List<Double> multFactors = new ArrayList<Double>();
-		//for(double factor = 2;  factor < 5; factor += 1) multFactors.add(factor);
-		multFactors.add(2.0);
+		for(double factor = 2;  factor < 5; factor += 1) multFactors.add(factor);
+		//multFactors.add(2.0);
 		ret.put(VLRRTnode.changeEpsilonScheme.Mult, multFactors);
 		
 		List<Double> restartFactors = new ArrayList<Double>();

@@ -115,11 +115,11 @@ generated worlds and records relevant statistics such as time spent to find the 
 The metrics we used to compare DVLRRT, VLRRT and RRT-GoalBias for this report are success rate (in terms of finding the goal) and running
 time. For DVLRRT and VLRRT, we also analyzed how the several $\epsilon$ modification schemes affect overall performance.
 
-\section{Preliminary Results} %100 or 50?
+\section{Preliminary Results}
 
 We executed each algorithm 100 times, in several representative worlds, with a time limit of 50 milliseconds: 
-a maze-like world (similar to the one in CITE), a largely unobstructed world with a particularly obstructed region in
-the path to the goal and a globally cluttered world.
+a maze-like world \emph{maze} (similar to the one in CITE), a largely unobstructed world with a particularly obstructed region in
+the path to the goal \emph{obstructed} and a globally cluttered world \emph{cluttered}.
 
 We can immediately observe that in all the test worlds, our algorithms perform generally better than RRT-GoalBias,
 frequently achieving higher average success rates and lower average execution times. However, and not unexpectedly,
@@ -141,8 +141,66 @@ Finally, our preliminary results further increase our confidence that our approa
 planning and that exploiting the gathered information for re-planning purposes should increase the performance gains
 even further.
 
-%Talk about the "bad ones"
 [table showing success rates]
+\begin{figure}[tp]
+\small{
+\begin{tabular}{|cccc|}
+\hline
+Algorithm & World & Avg. Success & Avg. Time\\
+\hline
+DVLRRT (M/R) & obstr. & 100\% & -\\
+VLRRT (M/R) & obstr. & 98\% & - \\
+DVLRRT (L/R) & obstr. & 98\% & - \\
+VLRRT (L/R) & obstr. & 97\% & -\\
+VLRRT (M/M) & obstr. & 83\% & -\\
+DVLRRT (L/L) & obstr. & 79\% & -\\
+DVLRRT (M/M) & obstr. & 76\% & -\\
+DVLRRT (R/R) & obstr. & 94\% & -\\
+RRT & obstr. & 95\% & -\\
+DVLRRT (M/R) & maze & 100\% & -\\
+VLRRT (M/R) & maze & 100\% & - \\
+DVLRRT (L/R) & maze & 100\% & - \\
+VLRRT (L/R) & maze & 100\% & -\\
+VLRRT (M/M) & maze & 100\% & -\\
+DVLRRT (L/L) & maze & 100\% & -\\
+DVLRRT (M/M) & maze & 100\% & -\\
+DVLRRT (R/R) & maze & 94\% & -\\
+RRT & clutt. & 88\% & -\\
+DVLRRT (M/R) & clutt. & 96\% & -\\
+VLRRT (M/R) & clutt. & 94\% & - \\
+DVLRRT (L/R) & clutt. & 74\% & - \\
+VLRRT (L/R) & clutt. & 64\% & -\\
+VLRRT (M/M) & clutt. & 53\% & -\\
+DVLRRT (L/L) & clutt. & 48\% & -\\
+DVLRRT (M/M) & clutt. & 49\% & -\\
+DVLRRT (R/R) & clutt. & 34\% & -\\
+RRT & clutt. & 36\% & -\\
+\hline
+\end{tabular}}
+\caption{Success Rates and Exec. Times}
+\end{figure}
+
+
+\begin{figure}[tp]
+\small{
+\begin{tabular}{|ccc|}
+\hline
+Algorithm & Avg. Success & Avg. Time\\
+\hline
+DVLRRT (M/R) & 99\% & -\\
+VLRRT (M/R) & 97.3\% & -\\
+DVLRRT (L/R) & 90\% & -\\
+VLRRT (L/R) & 87\% & -\\
+VLRRT (M/M) & 79\% & -\\
+DVLRRT (L/L) & 76\% & -\\
+DVLRRT (M/M) & 75\% & -\\
+VLRRT (L/L) & 74\% & -\\
+RRT & 73\% & -\\
+\hline
+\end{tabular}}
+\caption{Overall Results}
+\end{figure}
+
 
 [table showing world exploration on failure]
 

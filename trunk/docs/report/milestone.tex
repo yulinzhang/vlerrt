@@ -14,14 +14,12 @@
 
 \section{Introduction} 
 The RRT algorithm represents an extreme in the design space of planning algorithms.  
-It forsakes the optimality and explores the space through randomness and a small bias towards goals.  This is in marked contrast to other planning strategies such as visibility graphs or voronoi diagrams which carefully analyze and partition the space to find paths.  
+It forsakes optimality and explores the space through randomness and a small bias towards goals.  This is in marked contrast to other planning strategies such as visibility graphs or voronoi diagrams which carefully analyze and partition the space to find paths.  
 This difference makes RRT very efficient even in higher dimensional spaces because its computational overhead is small in comparison to other algorithms which attempt to precisely characterize the world.  However, this also means that RRT does not take advantage of information that it learns about the world while exploring.
 
 The central idea of our project is to introduce learning of the environment into the RRT algorithm for online use in the search and also for re-planning purposes.  We focus our efforts on the extension length for two reasons.  First, the RRT algorithm gets information about good and bad extension lengths from given points when it tests to see if a given extension fails.  Second, the optimal extension length varies based on the obstacles surrounding a given point.  The goal of this project is to extend the RRT planning and the ERRT re-planning algorithm to store and use information learned about good extension lengths while searching the space.  Our hope is that we can realize significant improvements in how fast and often RRT-based planning finds the goal, without sacrificing its key principles.
 
 Our main goal is to explore a set of variations in the standard RRT (and ERRT) algorithms to try and offer a better algorithm for these heterogeneous worlds both in planning and re-planning scenarios.
-
-\paragraph{Related Work}
 
 Some other papers describing extensions to the RRT algorithm which may be helpful include \cite{Lavalle98rapidly-exploringrandom},\cite{Lindemann04incrementallyreducing},\cite{Jaillet05adaptivetuning}, and \cite{moplan2009}.
 
@@ -118,7 +116,7 @@ time. For DVLRRT and VLRRT, we also analyzed how the several $\epsilon$ modifica
 \section{Preliminary Results}
 
 We executed each algorithm 100 times, in several representative worlds, with a time limit of 50 milliseconds: 
-a maze-like world \emph{maze} (similar to the one in CITE), a largely unobstructed world with a particularly obstructed region in
+a maze-like world \emph{maze} (similar to the one in \cite{Bruce02real-timerandomized}), a largely unobstructed world with a particularly obstructed region in
 the path to the goal \emph{obstructed} and a globally cluttered world \emph{cluttered}.
 
 We can immediately observe that in all the test worlds, our algorithms perform generally better than RRT-GoalBias,
@@ -141,70 +139,74 @@ Finally, our preliminary results further increase our confidence that our approa
 planning and that exploiting the gathered information for re-planning purposes should increase the performance gains
 even further.
 
-[table showing success rates]
 \begin{figure}[tp]
+\begin{center}
 \small{
 \begin{tabular}{|cccc|}
 \hline
-Algorithm & World & Avg. Success & Avg. Time\\
+Algorithm & World & Avg. Success & Avg. Time (sec.)\\
 \hline
-DVLRRT (M/R) & obstr. & 100\% & -\\
-VLRRT (M/R) & obstr. & 98\% & - \\
-DVLRRT (L/R) & obstr. & 98\% & - \\
-VLRRT (L/R) & obstr. & 97\% & -\\
-VLRRT (M/M) & obstr. & 83\% & -\\
-DVLRRT (L/L) & obstr. & 79\% & -\\
-DVLRRT (M/M) & obstr. & 76\% & -\\
-DVLRRT (R/R) & obstr. & 94\% & -\\
-RRT & obstr. & 95\% & -\\
-DVLRRT (M/R) & maze & 100\% & -\\
-VLRRT (M/R) & maze & 100\% & - \\
-DVLRRT (L/R) & maze & 100\% & - \\
-VLRRT (L/R) & maze & 100\% & -\\
-VLRRT (M/M) & maze & 100\% & -\\
-DVLRRT (L/L) & maze & 100\% & -\\
-DVLRRT (M/M) & maze & 100\% & -\\
-DVLRRT (R/R) & maze & 94\% & -\\
-RRT & clutt. & 88\% & -\\
-DVLRRT (M/R) & clutt. & 96\% & -\\
-VLRRT (M/R) & clutt. & 94\% & - \\
-DVLRRT (L/R) & clutt. & 74\% & - \\
-VLRRT (L/R) & clutt. & 64\% & -\\
-VLRRT (M/M) & clutt. & 53\% & -\\
-DVLRRT (L/L) & clutt. & 48\% & -\\
-DVLRRT (M/M) & clutt. & 49\% & -\\
-DVLRRT (R/R) & clutt. & 34\% & -\\
-RRT & clutt. & 36\% & -\\
+\bf{DVLRRT (M/R)} & \bf{obstr.} & \bf{100\%} & \bf{0.010}\\
+\bf{VLRRT (M/R)} & \bf{obstr.} & \bf{98\%} & \bf{0.009} \\
+DVLRRT (L/R) & obstr. & 98\% & 0.013 \\
+VLRRT (L/R) & obstr. & 97\% & 0.012\\
+VLRRT (M/M) & obstr. & 83\% & 0.021\\
+DVLRRT (L/L) & obstr. & 79\% & 0.016\\
+DVLRRT (M/M) & obstr. & 76\% & 0.017\\
+VLRRT (L/L) & obstr. & 78\% & 0.015\\
+DVLRRT (R/R) & obstr. & 94\% & 0.011\\
+\bf{RRT-GoalBias} & \bf{obstr.} & \bf{95\%} & \bf{0.013}\\
+\hline
+\bf{DVLRRT (M/R)} & \bf{maze} & \bf{100\%} & \bf{0.006}\\
+\bf{VLRRT (M/R)} & \bf{maze} & \bf{100\%} & \bf{0.006} \\
+DVLRRT (L/R) & maze & 100\% & 0.009 \\
+VLRRT (L/R) & maze & 100\% & 0.010\\
+VLRRT (M/M) & maze & 100\% & 0.004\\
+DVLRRT (L/L) & maze & 100\% & 0.008\\
+DVLRRT (M/M) & maze & 100\% & 0.004\\
+VLRRT (L/L) & maze & 100\% & 0.007\\
+DVLRRT (R/R) & maze & 94\% & 0.019\\
+\bf{RRT-GoalBias} & \bf{maze} & \bf{88\%} & \bf{0.018}\\
+\hline
+\bf{DVLRRT (M/R)} & \bf{clutt.} & \bf{96\%} & \bf{0.023}\\
+\bf{VLRRT (M/R)} & \bf{clutt.} & \bf{94\%} & \bf{0.025} \\
+DVLRRT (L/R) & clutt. & 74\% & 0.035 \\
+VLRRT (L/R) & clutt. & 64\% & 0.035\\
+VLRRT (M/M) & clutt. & 53\% & 0.030\\
+DVLRRT (L/L) & clutt. & 48\% & 0.032\\
+DVLRRT (M/M) & clutt. & 49\% & 0.029\\
+VLRRT (L/L) & clutt. & 45\% & 0.031\\
+DVLRRT (R/R) & clutt. & 34\% & 0.040\\
+\bf{RRT-GoalBias} & \bf{clutt.} & \bf{36\%} & \bf{0.039}\\
 \hline
 \end{tabular}}
+\end{center}
 \caption{Success Rates and Exec. Times}
 \end{figure}
 
 
 \begin{figure}[tp]
+\begin{center}
 \small{
 \begin{tabular}{|ccc|}
 \hline
-Algorithm & Avg. Success & Avg. Time\\
+Algorithm & Avg. Success & Avg. Time (sec.)\\
 \hline
-DVLRRT (M/R) & 99\% & -\\
-VLRRT (M/R) & 97.3\% & -\\
-DVLRRT (L/R) & 90\% & -\\
-VLRRT (L/R) & 87\% & -\\
-VLRRT (M/M) & 79\% & -\\
-DVLRRT (L/L) & 76\% & -\\
-DVLRRT (M/M) & 75\% & -\\
-VLRRT (L/L) & 74\% & -\\
-RRT & 73\% & -\\
+\bf{DVLRRT (M/R)} & \bf{99\%} & \bf{0.013}\\
+\bf{VLRRT (M/R)} & \bf{97.3\%} & \bf{0.013}\\
+DVLRRT (L/R) & 90\% & 0.019\\
+VLRRT (L/R) & 87\% & 0.019\\
+VLRRT (M/M) & 79\% & 0.018\\
+DVLRRT (L/L) & 76\% & 0.018\\
+DVLRRT (M/M) & 75\% & 0.017\\
+VLRRT (L/L) & 74\% & 0.018\\
+DVLRRT (R/R) & 74\% & 0.023\\
+\bf{RRT-GoalBias} & \bf{73\%} & \bf{0.023}\\
 \hline
 \end{tabular}}
+\end{center}
 \caption{Overall Results}
 \end{figure}
-
-
-[table showing world exploration on failure]
-
-[table showing time to goal on success]
 
 \section{Current Progress and Future Steps}
 
@@ -217,7 +219,7 @@ Our claim is that if the information we collect
 about the world does indeed produce good results, then we should be able to incorporate that
 information in subsequent executions (i.e re-planning) by extrapolating the unobstructed regions of
 the world from the $\epsilon$ values of the previous executions. A possible way to do this can be
-to generate the regions using a K-Nearest Neighbors algorithm. Under the reasonable assumption
+to generate the regions using a K-Nearest Neighbors algorithm \cite{citeulike:995135}. Under the reasonable assumption
 that the world doesn't change too much between executions, we can use the region information to
 \emph{a priori} inform the $\epsilon$ values of points that fall within said regions.
 

@@ -2,9 +2,10 @@
 
 \usepackage{project}
 
-\newcommand{\projectstage}{- Milestone Report - }
-\newcommand{\projecttitle}{Improving the Efficiency of RRT in
-  Heterogeneous Environments with Context Sensitivity}
+%\newcommand{\projectstage}{ - Milestone Report - }
+%\newcommand{\projecttitle}{Improving the Efficiency of RRT in
+ % Heterogeneous Environments with Context Sensitivity}
+\newcommand{\projecttitle}{Improving RRT with Context Sensitivity}
 \newcommand{\authors}{Filipe Milit\~{a}o, Karl Naden,  Bernardo Toninho}
 \newcommand{\projectdate}{\today}
 
@@ -115,25 +116,28 @@ time. For DVLRRT and VLRRT, we also analyzed how the several $\epsilon$ modifica
 
 \section{Preliminary Results}
 
-
 We executed each algorithm 10000 times, in several representative worlds, with a time limit of 50 milliseconds: 
 a maze-like world \emph{maze} (similar to the one in
-\cite{Bruce02real-timerandomized}), a largely unobstructed world with a particularly obstructed region in the path to the goal \emph{obstructed} and a more highly cluttered world \emph{cluttered}.
+\cite{Bruce02real-timerandomized}), a largely unobstructed world with
+a particularly obstructed region 
+in the path to the goal \emph{obstructed} and a more highly cluttered world \emph{cluttered}.
 
-We can observe that in all the test worlds, our algorithms perform generally better than RRT-GoalBias,
+We can observe that in all the test worlds, our algorithms perform
+generally better (or as good) than RRT-GoalBias,
 achieving higher average success rates and lower average execution
 times, noting that in worlds where RRT-GoalBias already performs
 very well, the gains achieved by our algorithms are naturally smaller.
 
 However, and not unexpectedly, the performance increase of our algorithms does not occur for all
-$\epsilon$ modification schemes. 
-
-Our intuition is that we want to ``speed through'' what we consider to be unobstructed regions, but decrease our
+$\epsilon$ modification schemes.
+Our intuition was that we wanted to ``speed through'' what we consider to be unobstructed regions, but decrease our
 ``speed'' as fast as possible when we find an obstructed region, so we can effectively navigate through it. As it turns
 out, our intuition is indeed correct, seeing as the modification schemes that perform the best are those that
 increase $\epsilon$ faster but decrease $\epsilon$ even faster, in both VLRRT and DVLRRT. Particularly, the best
 results were obtained when the increase rate was the highest (multplicative scheme) and the decrease rate was the 
-highest as well (restarting scheme).
+highest as well (restarting scheme). For the sake of readability, we
+omit the results regarding other modification schemes, noting that, in
+general, choosing a ``slow'' decrease rate produces overall bad results.
 
 %Note that even if both increase and decrease schemes are
 %linear, both our algorithms still (in average) can perform better than
@@ -149,40 +153,32 @@ even further.
 \footnotesize{
 \begin{tabular}{|cccc|}
 \hline
-Algorithm & World & Avg. Success & Avg. Time (sec.)\\
+Algorithm & World & Avg. & Avg.\\
+& & Success & Time (ms.)\\
 \hline
-\bf{DVLRRT (M/R)} & \bf{obstr.} & \bf{100\%} & \bf{0.010}\\
-\bf{VLRRT (M/R)} & \bf{obstr.} & \bf{98\%} & \bf{0.009} \\
-DVLRRT (L/R) & obstr. & 98\% & 0.013 \\
-VLRRT (L/R) & obstr. & 97\% & 0.012\\
-VLRRT (M/M) & obstr. & 83\% & 0.021\\
-DVLRRT (L/L) & obstr. & 79\% & 0.016\\
-DVLRRT (M/M) & obstr. & 76\% & 0.017\\
-VLRRT (L/L) & obstr. & 78\% & 0.015\\
-DVLRRT (R/R) & obstr. & 94\% & 0.011\\
-\bf{RRT-GoalBias} & \bf{obstr.} & \bf{95\%} & \bf{0.013}\\
+RRT-GoalBias & obstr. & 95\% & 11.94\\
+VLRRT (M2/R) & obstr. & 96\% & 13.48\\
+VLRRT (M4/R) & obstr. & 95\% & 13.32\\
+DVLRRT (M2/R1) & obstr. & 96\% & 13.65\\
+DVLRRT (M3/R1) & obstr. & 96\% & 13.41\\
+DVLRRT (M4/R1) & obstr. & 96\% & 13.38\\
+VLRRT (M3/R1) & obstr. & 95\% & 13.61\\ 
 \hline
-\bf{DVLRRT (M/R)} & \bf{maze} & \bf{100\%} & \bf{0.006}\\
-\bf{VLRRT (M/R)} & \bf{maze} & \bf{100\%} & \bf{0.006} \\
-DVLRRT (L/R) & maze & 100\% & 0.009 \\
-VLRRT (L/R) & maze & 100\% & 0.010\\
-VLRRT (M/M) & maze & 100\% & 0.004\\
-DVLRRT (L/L) & maze & 100\% & 0.008\\
-DVLRRT (M/M) & maze & 100\% & 0.004\\
-VLRRT (L/L) & maze & 100\% & 0.007\\
-DVLRRT (R/R) & maze & 94\% & 0.019\\
-\bf{RRT-GoalBias} & \bf{maze} & \bf{88\%} & \bf{0.018}\\
+RRT-GoalBias & maze & 91\% & 17.26\\
+VLRRT (M2/R) & maze & 99\% & 10.59\\
+VLRRT (M4/R) & maze & 99\% & 10.60\\
+DVLRRT (M2/R1) & maze & 99\% & 10.50\\
+DVLRRT (M3/R1) & maze & 99\% & 10.69\\
+DVLRRT (M4/R1) & maze & 99\% & 10.74\\
+VLRRT (M3/R1) & maze & 99\% & 10.69\\ 
 \hline
-\bf{DVLRRT (M/R)} & \bf{clutt.} & \bf{96\%} & \bf{0.023}\\
-\bf{VLRRT (M/R)} & \bf{clutt.} & \bf{94\%} & \bf{0.025} \\
-DVLRRT (L/R) & clutt. & 74\% & 0.035 \\
-VLRRT (L/R) & clutt. & 64\% & 0.035\\
-VLRRT (M/M) & clutt. & 53\% & 0.030\\
-DVLRRT (L/L) & clutt. & 48\% & 0.032\\
-DVLRRT (M/M) & clutt. & 49\% & 0.029\\
-VLRRT (L/L) & clutt. & 45\% & 0.031\\
-DVLRRT (R/R) & clutt. & 34\% & 0.040\\
-\bf{RRT-GoalBias} & \bf{clutt.} & \bf{36\%} & \bf{0.039}\\
+RRT-GoalBias & clutt. & 33\% & 39.26\\
+VLRRT (M2/R) & clutt. & 60\% & 34.00\\
+VLRRT (M4/R) & clutt. & 59\% & 33.61\\
+DVLRRT (M2/R1) & clutt. & 60\% & 33.86\\
+DVLRRT (M3/R1) & clutt. & 60\% & 33.73\\
+DVLRRT (M4/R1) & clutt. & 60\% & 33.89\\
+VLRRT (M3/R1) & clutt. & 60\% & 33.90\\ 
 \hline
 \end{tabular}}
 \end{center}
@@ -193,22 +189,18 @@ DVLRRT (R/R) & clutt. & 34\% & 0.040\\
 \footnotesize{
 \begin{tabular}{|ccc|}
 \hline
-Algorithm & Avg. Success & Avg. Time (sec.)\\
+Algorithm & Avg. Succ. Rate & Avg. Time\\
 \hline
-\bf{DVLRRT (M/R)} & \bf{99\%} & \bf{0.013}\\
-\bf{VLRRT (M/R)} & \bf{97.3\%} & \bf{0.013}\\
-DVLRRT (L/R) & 90\% & 0.019\\
-VLRRT (L/R) & 87\% & 0.019\\
-VLRRT (M/M) & 79\% & 0.018\\
-DVLRRT (L/L) & 76\% & 0.018\\
-DVLRRT (M/M) & 75\% & 0.017\\
-VLRRT (L/L) & 74\% & 0.018\\
-DVLRRT (R/R) & 74\% & 0.023\\
-\bf{RRT-GoalBias} & \bf{73\%} & \bf{0.023}\\
+VLRRT (M2/R) & 17\% & -15\%\\
+VLRRT (M4/R) & 16\% & -16\%\\
+DVLRRT (M2/R1) & 17\% & -15\%\\
+DVLRRT (M3/R1) & 16\% & -16\%\\
+DVLRRT (M4/R1) & 17\% & -15\%\\
+VLRRT (M3/R1) & 16\% & -15\%\\ 
 \hline
 \end{tabular}}
 \end{center}
-\caption{Overall Results}
+\caption{Overall Gains versus RRT}
 \end{figure}
 
 \section{Current Progress and Future Steps}

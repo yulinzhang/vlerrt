@@ -1,6 +1,7 @@
 \documentclass[10pt,twoside,twocolumn]{article}
 
 \usepackage{project}
+\usepackage{graphicx}
 
 %\newcommand{\projectstage}{ - Milestone Report - }
 %\newcommand{\projecttitle}{Improving the Efficiency of RRT in
@@ -22,7 +23,7 @@ The central idea of our project is to introduce learning of the environment into
 
 Our main goal is to explore a set of variations in the standard RRT (and ERRT) algorithms to try and offer a better algorithm for these heterogeneous worlds both in planning and re-planning scenarios.
 
-Some other papers describing extensions to the RRT algorithm which may be helpful include \cite{Lavalle98rapidly-exploringrandom},\cite{Lindemann04incrementallyreducing},\cite{Jaillet05adaptivetuning}, and \cite{moplan2009}.
+Some other papers describing extensions to the RRT algorithm which include \cite{Lavalle98rapidly-exploringrandom},\cite{Lindemann04incrementallyreducing},\cite{Jaillet05adaptivetuning}, and \cite{moplan2009}.
 
 
 \section{RRT Algorithms}
@@ -137,18 +138,34 @@ increase $\epsilon$ faster but decrease $\epsilon$ even faster, in both VLRRT an
 results were obtained when the increase rate was the highest (multplicative scheme) and the decrease rate was the 
 highest as well (restarting scheme). For the sake of readability, we
 omit the results regarding other modification schemes, noting that, in
-general, choosing a ``slow'' decrease rate produces overall bad results.
+general, choosing a ``slow'' decrease rate produces overall bad
+results.
 
-%Note that even if both increase and decrease schemes are
-%linear, both our algorithms still (in average) can perform better than
-%RRT-GoalBias (more noticeably in execution time than success
-%rate). This hints that even the over-approximation of VLRRT still can turn out to be better than the static nature of RRT-GoalBias.
+Analyzing the actual values (Fig.~\ref{fig:worlds}), we can see that in the \emph{obstructed}
+world, RRT-GoalBias already performs very well, therefore our gains
+are less considerable. In fact, we gain a marginal overhead in terms
+of time due to extra computation. In the \emph{maze} world,
+RRT-GoalBias performs a bit worse, since the world is generally more
+complex. In this world, our algorithms start to shine. Not only do
+they find they goal almost $100\%$ of the runs, they actually find the
+goal faster. This shows that our algorithms are indeed able to
+navigate such worlds faster and more successfully, given that they can
+adapt themselves to the world in question.
+Finally, in the \emph{cluttered} world, RRT-GoalBias does not fair
+well at all, given the high degree of heterogeneity in the world. Our
+algorithms however (not unexpectedly), 
+manage to not only find paths to the goal more frequently
+(approx. twice as better), but also do so faster. 
+Overall, we can conclude that our algorithms obtain an increase
+of success rate (in terms of finding the goal) of approximately
+$16\%$ and a decrease in running time of approximately $15\%$,
+depending on the type of world we consider.
 
-Finally, our preliminary results further increase our confidence that our approach can indeed produce effective gains in
+To conclude, our preliminary results further increase our confidence that our approach can indeed produce effective gains in
 planning and that exploiting the gathered information for re-planning purposes should increase the performance gains
 even further.
 
-\begin{figure}[tp]
+\begin{figure}[t]
 \begin{center}
 \footnotesize{
 \begin{tabular}{|cccc|}
@@ -182,9 +199,9 @@ VLRRT (M3/R1) & clutt. & 60\% & 33.90\\
 \hline
 \end{tabular}}
 \end{center}
-\caption{Success Rates and Exec. Times}
+\caption{Success Rates and Exec. Times}\label{fig:worlds}
 \end{figure}
-\begin{figure}[tp]
+\begin{figure}[t]
 \begin{center}
 \footnotesize{
 \begin{tabular}{|ccc|}
@@ -203,7 +220,7 @@ VLRRT (M3/R1) & 16\% & -15\%\\
 \caption{Overall Gains versus RRT}
 \end{figure}
 
-\section{Current Progress and Future Steps}
+\section{Progress and Future Steps}
 
 We have successfully implemented and evaluated two strategies that improve RRT-GoalBias by
 taking into account information about the world during planning. We will now
@@ -213,40 +230,40 @@ in re-planning scenarios (in comparison to ERRT).
 Our claim is that if the information we collect
 about the world does indeed produce good results, then we should be able to incorporate that
 information in subsequent executions (i.e re-planning) by extrapolating the unobstructed regions of
-the world from the $\epsilon$ values of the previous executions. A possible way to do this can be
+the world from the $\epsilon$ values of the previous executions. A possible way to do this is
 to generate the regions using a K-Nearest Neighbors algorithm \cite{citeulike:995135}. Under the reasonable assumption
 that the world doesn't change too much between executions, we can use the region information to
-\emph{a priori} inform the $\epsilon$ values of points that fall within said regions.
+\emph{a priori} inform the $\epsilon$ values of points that fall
+within said regions.
 
 
 \bibliography{AIbib}{}
 \bibliographystyle{alpha}
 
+\appendix 
+\section{World Images}
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.20]{paper_world.png}
+\end{center}
+\caption{Maze World}
+\end{figure}
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.2]{cluttered_world.png}
+\end{center}
+\caption{Cluttered World}
+\end{figure}
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.2]{prop_world.png}
+\end{center}
+\caption{Obstructed World}
+\end{figure}
+
 \end{document}
 
-
-
-
-We executed each algorithm 100 times, in several representative worlds, with a time limit of 50 milliseconds: 
-a maze-like world \emph{maze} (similar to the one in \cite{Bruce02real-timerandomized}), a largely unobstructed world with a particularly obstructed region in
-the path to the goal \emph{obstructed} and a globally cluttered world \emph{cluttered}.
-
-We can immediately observe that in all the test worlds, our algorithms perform generally better than RRT-GoalBias,
-frequently achieving higher average success rates and lower average execution times. However, and not unexpectedly,
-that is not the case for all $\epsilon$ modification schemes. 
-
-Our intuition is that we want to ``speed through'' what we consider to be unobstructed regions, but decrease our
-``speed'' as fast as possible when we find an obstructed region, so we can effectively navigate through it. As it turns
-out, our intuition is indeed correct, seeing as the modification schemes that perform the best are those that
-increase $\epsilon$ faster but decrease $\epsilon$ even faster, in both VLRRT and DVLRRT. Particularly, the best
-results were obtained when the increase rate was the highest (multplicative scheme) and the decrease rate was the 
-highest as well (restarting scheme).
-Not surprisingly,
-DVLRRT performs better than VLRRT in such configurations, since VLRRT can more easily over-generalize what it
-considers to be an obstructed or an unobstructed region. Note that even if both increase and decrease schemes are
-linear, both our algorithms still outperform RRT-GoalBias (more noticeably in execution time than success rate). This
-confirms that even the over-approximation of VLRRT still turns out to be better than the static nature of RRT-GoalBias.
-
-Finally, our preliminary results further increase our confidence that our approach does indeed produce effective gains in
-planning and that exploiting the gathered information for re-planning purposes should increase the performance gains
-even further.
+%Note that even if both increase and decrease schemes are
+%linear, both our algorithms still (in average) can perform better than
+%RRT-GoalBias (more noticeably in execution time than success
+%rate). This hints that even the over-approximation of VLRRT still can turn out to be better than the static nature of RRT-GoalBias.

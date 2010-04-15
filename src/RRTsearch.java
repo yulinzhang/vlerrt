@@ -13,68 +13,26 @@ public class RRTsearch {
 		}
 
 		
-		RRTsearch search = basicRRT(testWorld,20,10,false);
-		search.runSearch();
-		search.show("RRT");
-		
-		try {
-			testWorld = new RRTWorld("worlds/proposal-world");
-		} catch (Exception e) {
-			testWorld = new RRTWorld(400,400);
-		}
-
-		
-		RRTsearch searchO = basicRRT(testWorld,20,10,true);
-		searchO.runSearch();
-		searchO.show("RRT-O");
-		
-		try {
-			testWorld = new RRTWorld("worlds/proposal-world");
-		} catch (Exception e) {
-			testWorld = new RRTWorld(400,400);
-		}
-
+		RRTsearch search = basicRRT(testWorld,20,10);
+		search.runSearch(1200);
+		search.show("RRT", true);
 		
 		RRTsearch searchV = VLRRT(testWorld,20,10,VLRRTnode.changeEpsilonScheme.Mult, 2, 
-									VLRRTnode.changeEpsilonScheme.Restart,1, false);
-		searchV.runSearch();
-		searchV.show("VLRRT");
+									VLRRTnode.changeEpsilonScheme.Restart,1);
+		searchV.runSearch(1200);
+		searchV.show("VLRRT", true);
 		
 		try {
 			testWorld = new RRTWorld("worlds/proposal-world");
 		} catch (Exception e) {
 			testWorld = new RRTWorld(400,400);
 		}
-
-		
-		RRTsearch searchVO = VLRRT(testWorld,20,10,VLRRTnode.changeEpsilonScheme.Mult, 2, 
-				VLRRTnode.changeEpsilonScheme.Restart,1, true);
-		searchVO.runSearch();
-		searchVO.show("VLRRT-O");
-
-		try {
-			testWorld = new RRTWorld("worlds/proposal-world");
-		} catch (Exception e) {
-			testWorld = new RRTWorld(400,400);
-		}
-
-		
+	
 		RRTsearch searchD = DVLRRT(testWorld,20,10,VLRRTnode.changeEpsilonScheme.Mult, 2, 
-									VLRRTnode.changeEpsilonScheme.Restart,1, false);
-		searchD.runSearch();
-		searchD.show("DVLRRT");
+									VLRRTnode.changeEpsilonScheme.Restart,1);
+		searchD.runSearch(1200);
+		searchD.show("DVLRRT",true);
 		
-		try {
-			testWorld = new RRTWorld("worlds/proposal-world");
-		} catch (Exception e) {
-			testWorld = new RRTWorld(400,400);
-		}
-
-		
-		RRTsearch searchDO = DVLRRT(testWorld,20,10,VLRRTnode.changeEpsilonScheme.Mult, 2, 
-				VLRRTnode.changeEpsilonScheme.Restart,1, true);
-		searchDO.runSearch();
-		searchDO.show("DVLRRT-O");
 	}
 	
 	public enum Algorithm {
@@ -252,8 +210,12 @@ public class RRTsearch {
 		r = new Random(System.currentTimeMillis());
 	}
 	
-	public Tree getsearchTree() {
+	public Tree getSearchTree() {
 		return searchTree;
+	}
+	
+	public World getWorld() {
+		return w;
 	}
 	
 	public void show(){
@@ -266,15 +228,18 @@ public class RRTsearch {
 //		GUI.screenshot(w, searchTree, "asd");	
 	}
 	
+	public void show(String title, boolean halos){
+		GUI.display(w, searchTree, title, halos);
+//		GUI.screenshot(w, searchTree, "asd");	
+	}
+	
 	public void screenshot(String filename) {
 		GUI.screenshot(w,searchTree,filename);
 	}
 	
-	
-	
-	public void runSearch() {
+	public void runSearch(int iterations) {
 		Node next = null;
-		for (int count = 1; count < 1200 && !done; count++){
+		for (int count = 0; count < iterations && !done; count++){
 			next = step(new Stats()); //Dummy
 			if (next != null) searchTree.add(next);
 		}
@@ -331,6 +296,7 @@ public class RRTsearch {
 			return null;
 		}
 		else {
+			from.reportExtensionStatus(toward, true);
 			Node ret = getNewNode(destination, from);
 			
 			if (reachGoal) {
@@ -339,7 +305,7 @@ public class RRTsearch {
 				stats.setGoal(ret);
 				if (optimize) optimizePath(ret);
 			}
-			from.reportExtensionStatus(toward, true);
+			
 			stats.incTreeCoverage(RRTsearch.euclidianDistance(from.getPoint(), destination));
 			return ret;
 		}	

@@ -50,6 +50,11 @@ public class VLRRTnode extends RRTnode {
 	public double getExtensionLength(Point2D to) {
 		return extLength*epsilon;
 	}
+	
+	@Override
+	public double getExtensionLength(double direction) {
+		return extLength*epsilon;
+	}
 
 	@Override
 	public void reportExtensionStatus(Point2D to, boolean succeeded) {

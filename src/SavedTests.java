@@ -18,7 +18,9 @@ public class SavedTests {
 	public static void main(String[] args) throws Exception {
 		//screenShotTests(args);
 		//basicTest(args);
-		testEpsilonChangeSchemes(args);
+		testEpsilonChangeSchemes(args,1000);
+		//testMultRestartInDepth(args);
+		//testVariedBaseLengths(args);
 	}
 	
 	private static void screenShotTests(String[] args) throws Exception {
@@ -72,13 +74,15 @@ public class SavedTests {
 		
 	}
 	
-	private static void testEpsilonChangeSchemes(String[] worlds) throws Exception {
+	private static void testEpsilonChangeSchemes(String[] worlds, int iterations) throws Exception {
 		
 
 		Map<VLRRTnode.changeEpsilonScheme,List<Double>> tests = constructTests();
 		List<RRTsearch.Algorithm> algs = new ArrayList<RRTsearch.Algorithm>();
 		algs.add(RRTsearch.Algorithm.VLRRT);
 		algs.add(RRTsearch.Algorithm.DVLRRT);	
+		int baseLength = 10;
+		int numTests = iterations;
 
 		ResultSetData results;
 		String prefix = "changeSchemeTests";
@@ -100,20 +104,20 @@ public class SavedTests {
 				fwr.write("" + RRTsearch.Algorithm.RRT + sep + 0 + sep + 0 + sep + 0 + sep + 0); //header
 
 				for (int w = 0; w < worlds.length; w++) { //not optimized
-					results = testScheme(RRTsearch.Algorithm.RRT, worlds[w], false, null, 0, null, 0); 
+					results = testScheme(numTests, baseLength, RRTsearch.Algorithm.RRT, worlds[w], false, null, 0, null, 0); 
 					fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
 				}
 	
 				fwr.write("\n");
 				
-				fwr.write("" + RRTsearch.Algorithm.RRT + "_O" + sep + 0 + sep + 0 + sep + 0 + sep + 0); //header
-
-				for (int w = 0; w < worlds.length; w++) { //optimized
-					results = testScheme(RRTsearch.Algorithm.RRT, worlds[w], true, null, 0, null, 0); 
-					fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
-				}
-	
-				fwr.write("\n");
+//				fwr.write("" + RRTsearch.Algorithm.RRT + "_O" + sep + 0 + sep + 0 + sep + 0 + sep + 0); //header
+//
+//				for (int w = 0; w < worlds.length; w++) { //optimized
+//					results = testScheme(numTests, baseLength, RRTsearch.Algorithm.RRT, worlds[w], true, null, 0, null, 0); 
+//					fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
+//				}
+//	
+//				fwr.write("\n");
 				
 				
 
@@ -125,21 +129,21 @@ public class SavedTests {
 							for (RRTsearch.Algorithm alg : algs) { //line for each alg/change scheme combination
 								fwr.write("" + alg + sep + incScheme + sep + incFactor + sep + decScheme + sep + decFactor); //header
 								for (int w = 0; w < worlds.length; w++) {
-									results = testScheme(alg, worlds[w], false, incScheme, incFactor, decScheme, decFactor);
+									results = testScheme(numTests, baseLength, alg, worlds[w], false, incScheme, incFactor, decScheme, decFactor);
 									//fwr.write(sep + results);
 									fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
 									System.out.println(results);
 								}
 								fwr.write("\n");
 								
-								fwr.write("" + alg + "_0" + sep + incScheme + sep + incFactor + sep + decScheme + sep + decFactor); //header
-								for (int w = 0; w < worlds.length; w++) {
-									results = testScheme(alg, worlds[w], true, incScheme, incFactor, decScheme, decFactor);
-									//fwr.write(sep + results);
-									fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
-									System.out.println(results);
-								}
-								fwr.write("\n");
+//								fwr.write("" + alg + "_0" + sep + incScheme + sep + incFactor + sep + decScheme + sep + decFactor); //header
+//								for (int w = 0; w < worlds.length; w++) {
+//									results = testScheme(numTests, baseLength, alg, worlds[w], true, incScheme, incFactor, decScheme, decFactor);
+//									//fwr.write(sep + results);
+//									fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
+//									System.out.println(results);
+//								}
+//								fwr.write("\n");
 							}
 						}
 					}
@@ -154,10 +158,149 @@ public class SavedTests {
 
 	}
 	
-	private static ResultSetData testScheme(RRTsearch.Algorithm alg, String world, boolean optimize, 
+private static void testMultRestartInDepth(String[] worlds) throws Exception {
+		
+		List<RRTsearch.Algorithm> algs = new ArrayList<RRTsearch.Algorithm>();
+		algs.add(RRTsearch.Algorithm.VLRRT);
+		algs.add(RRTsearch.Algorithm.DVLRRT);	
+		int numTests = 10000;
+		int baseLength = 10;
+
+		ResultSetData results;
+		String prefix = "changeSchemeTests" + numTests + "_";
+		
+		File f = new File(prefix + System.currentTimeMillis());
+
+		try {
+
+			FileWriter fwr = new FileWriter(f);
+			
+			
+
+			fwr.write("Algorithm" + sep + "IncScheme" + sep + "incFactor" + sep + "decScheme" + sep + "decFactor");
+			for (int w = 0; w < worlds.length; w++) fwr.write(sep + worlds[w].substring(7) + sep + sep);
+			fwr.write("\n");
+
+			fwr.write("" + RRTsearch.Algorithm.RRT + sep + 0 + sep + 0 + sep + 0 + sep + 0); //header
+
+			for (int w = 0; w < worlds.length; w++) { //not optimized
+				results = testScheme(numTests, baseLength, RRTsearch.Algorithm.RRT, worlds[w], false, null, 0, null, 0); 
+				fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
+			}
+	
+			fwr.write("\n");
+				
+			fwr.write("" + RRTsearch.Algorithm.RRT + "_O" + sep + 0 + sep + 0 + sep + 0 + sep + 0); //header
+
+			for (int w = 0; w < worlds.length; w++) { //optimized
+				results = testScheme(numTests, baseLength, RRTsearch.Algorithm.RRT, worlds[w], true, null, 0, null, 0); 
+				fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
+			}
+	
+			fwr.write("\n");
+			
+			VLRRTnode.changeEpsilonScheme incScheme = VLRRTnode.changeEpsilonScheme.Mult;
+			VLRRTnode.changeEpsilonScheme decScheme = VLRRTnode.changeEpsilonScheme.Restart;
+			double decFactor = 1;  //doesn't matter
+
+			
+			for (double incFactor = 2; incFactor < 5; incFactor++) {
+				for (RRTsearch.Algorithm alg : algs) { //line for each alg/change scheme combination
+					fwr.write("" + alg + sep + incScheme + sep + incFactor + sep + decScheme + sep + decFactor); //header
+					for (int w = 0; w < worlds.length; w++) {
+						results = testScheme(numTests, baseLength, alg, worlds[w], false, incScheme, incFactor, decScheme, decFactor);
+
+						fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
+						System.out.println(results);
+					}
+					fwr.write("\n");
+					
+					fwr.write("" + alg + "_0" + sep + incScheme + sep + incFactor + sep + decScheme + sep + decFactor); //header
+					for (int w = 0; w < worlds.length; w++) {
+						results = testScheme(numTests, baseLength, alg, worlds[w], true, incScheme, incFactor, decScheme, decFactor);
+						//fwr.write(sep + results);
+						fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
+						System.out.println(results);
+					}
+					fwr.write("\n");
+				}
+			}
+	
+			fwr.close();
+		} catch (FileNotFoundException e) {
+			System.err.println("Bad file.");
+		} catch (IOException e) {
+			System.err.println("Error writing to file.");
+		}
+
+	}
+	
+private static void testVariedBaseLengths(String[] worlds) throws Exception {
+	
+	List<RRTsearch.Algorithm> algs = new ArrayList<RRTsearch.Algorithm>();
+	algs.add(RRTsearch.Algorithm.VLRRT);
+	algs.add(RRTsearch.Algorithm.DVLRRT);	
+	int numTests = 100;
+
+	ResultSetData results;
+	String prefix = "changeSchemeTests" + numTests + "_";
+	
+	File f = new File(prefix + System.currentTimeMillis());
+
+	try {
+
+		FileWriter fwr = new FileWriter(f);
+		
+		
+
+		fwr.write("Algorithm" + sep + "BaseLength" + sep + "Mult incFactor");
+		for (int w = 0; w < worlds.length; w++) fwr.write(sep + worlds[w].substring(7) + sep + "dist" + sep + "time");
+		fwr.write("\n");
+
+		for (int baseLength = 2; baseLength <= 10; baseLength = baseLength + 2 ) {
+			fwr.write("" + RRTsearch.Algorithm.RRT + sep + baseLength); //header
+			for (int w = 0; w < worlds.length; w++) { //not optimized
+				results = testScheme(numTests, baseLength, RRTsearch.Algorithm.RRT, worlds[w], false, null, 0, null, 0); 
+				fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
+				System.out.println(results);
+			}
+			fwr.write("\n");
+		}
+
+		
+		VLRRTnode.changeEpsilonScheme incScheme = VLRRTnode.changeEpsilonScheme.Mult;
+		VLRRTnode.changeEpsilonScheme decScheme = VLRRTnode.changeEpsilonScheme.Restart;
+		double decFactor = 1;  //doesn't matter
+
+		for (double incFactor = 2; incFactor < 5; incFactor++) {
+			for (int baseLength = 2; baseLength <= 10; baseLength = baseLength +2) {
+				for (RRTsearch.Algorithm alg : algs) { //line for each alg/change scheme combination
+					fwr.write("" + alg + sep + baseLength + sep + incFactor); //header
+					for (int w = 0; w < worlds.length; w++) {
+						results = testScheme(numTests, baseLength, alg, worlds[w], false, incScheme, incFactor, decScheme, decFactor);
+
+						fwr.write(sep + results.successRate + sep + results.avePathDist + sep + results.aveTime);
+						System.out.println(results);
+					}
+					fwr.write("\n");
+				
+				}
+			}
+		}
+
+		fwr.close();
+	} catch (FileNotFoundException e) {
+		System.err.println("Bad file.");
+	} catch (IOException e) {
+		System.err.println("Error writing to file.");
+	}
+
+}
+
+	private static ResultSetData testScheme(int numRuns, int baseLength, RRTsearch.Algorithm alg, String world, boolean optimize, 
 			VLRRTnode.changeEpsilonScheme inc, double incFactor, VLRRTnode.changeEpsilonScheme dec, double decFactor) throws Exception {
-		Testing test = new Testing(20,10,0,null,new RRTWorld(world), optimize ,inc,incFactor,dec,decFactor);
-		test.execNRuns(100, alg);
+		Testing test = new Testing(20,baseLength,0,null,new RRTWorld(world), optimize ,inc,incFactor,dec,decFactor);
+		test.execNRuns(numRuns, alg);
 		ResultSetData data = getData(test.getStats());
 		return data;		
 	}

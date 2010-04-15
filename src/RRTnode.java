@@ -34,6 +34,10 @@ public class RRTnode implements Node {
 	public double getExtensionLength(Point2D to) {
 		return extLength;
 	}
+	
+	public double getExtensionLength(double direction) {
+		return extLength;
+	}
 
 	public void reportExtensionStatus(Point2D to, boolean succeeded) {
 		//DO nothing

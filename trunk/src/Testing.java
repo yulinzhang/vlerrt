@@ -185,7 +185,7 @@ public class Testing {
 			System.out.println("World Coverage: "+stat.getTreeCoverage());
 			System.out.println("Goal Distance: "+stat.getgDistance());
 		}
-		stat.setnNodes(searcher.getsearchTree().nNodes());
+		stat.setnNodes(searcher.getSearchTree().nNodes());
 		stats.add(stat); //Store for future processing.
 				
 		//searcher.show();

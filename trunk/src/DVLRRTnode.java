@@ -176,7 +176,12 @@ public class DVLRRTnode extends VLRRTnode {
 	
 	@Override
 	public double getExtensionLength(Point2D to) {
-		return extLength*dirEpsilon.getEpsilon(computeAngle(pt, to));  //use angle to get the epsilon
+		return getExtensionLength(computeAngle(pt, to));  //use angle to get the epsilon
+	}
+	
+	@Override
+	public double getExtensionLength(double direction) {
+		return extLength*dirEpsilon.getEpsilon(direction);  
 	}
 
 	@Override

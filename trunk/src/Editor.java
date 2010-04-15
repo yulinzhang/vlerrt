@@ -108,7 +108,7 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 					search.printStats("editorOut",false);//FIXME: halting bug.
 					
 					JDialog dialog = new JDialog();
-					dialog.add(new GUI(world,search.getSearcher().getsearchTree()));
+					dialog.add(new GUI(world,search.getSearcher().getSearchTree()));
 					dialog.pack();
 					dialog.setVisible(true);
 			}

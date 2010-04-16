@@ -119,23 +119,23 @@ public class RRTsearch {
 	
 	
 	//parameters
-	private World w;  //world to search in (includes start and goal points)
-	private int pGoal = 20; //0 <= pGoal <= 100-pWayPoint - probability to extend towards the goal
-	private int pWayPoint = 0; // 0 <= pWayPoint <= 100-pGoal - probability to extend towards a waypoint
-	private int baseLength = 10;  //base extension distance
-	private Algorithm type;
-	private VLRRTnode.changeEpsilonScheme inc = VLRRTnode.changeEpsilonScheme.Linear;
-	private double incFactor = .1;
-	private VLRRTnode.changeEpsilonScheme dec= VLRRTnode.changeEpsilonScheme.Linear;
-	private double decFactor = .1;
+	protected World w;  //world to search in (includes start and goal points)
+	protected int pGoal = 20; //0 <= pGoal <= 100-pWayPoint - probability to extend towards the goal
+	protected int pWayPoint = 0; // 0 <= pWayPoint <= 100-pGoal - probability to extend towards a waypoint
+	protected int baseLength = 10;  //base extension distance
+	protected Algorithm type;
+	protected VLRRTnode.changeEpsilonScheme inc = VLRRTnode.changeEpsilonScheme.Linear;
+	protected double incFactor = .1;
+	protected VLRRTnode.changeEpsilonScheme dec= VLRRTnode.changeEpsilonScheme.Linear;
+	protected double decFactor = .1;
 	
-	private Random r;  
-	private List<Node> wayPoints;
-	private Tree searchTree;
-	private boolean done = false;
-	private boolean halt = false;
+	protected Random r;  
+	protected List<Node> wayPoints;
+	protected Tree searchTree;
+	protected boolean done = false;
+	protected boolean halt = false;
 	
-	private boolean optimize = false;
+	protected boolean optimize = false;
 	
 	public RRTsearch() {
 		w = new RRTWorld(400,400);	
@@ -311,7 +311,7 @@ public class RRTsearch {
 		}	
 	}
 	
-	private Point2D.Double nextPoint(Point2D origin, Point2D towards, double length) {
+	protected Point2D.Double nextPoint(Point2D origin, Point2D towards, double length) {
 	
 		double xDelta,yDelta,hypotenuse;
 		double originX, originY, destinationX, destinationY;
@@ -357,7 +357,7 @@ public class RRTsearch {
 		return null;  //exception
 	}
 	
-	private void optimizePath(Node n) {
+	protected void optimizePath(Node n) {
 		Node start = n;
 		Node optimized, current;
 		

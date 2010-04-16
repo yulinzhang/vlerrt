@@ -13,7 +13,7 @@ public class VLRRTnode extends RRTnode {
 
 	}
 	
-	private double epsilon;
+	public double epsilon;
 	protected changeEpsilonScheme inc = changeEpsilonScheme.Linear;
 	protected double incFactor = .1;
 	protected changeEpsilonScheme dec = changeEpsilonScheme.Linear;
@@ -34,6 +34,19 @@ public class VLRRTnode extends RRTnode {
 		this.incFactor = incFactor;
 	}
 	
+	public VLRRTnode(Point2D point, VLRRTnode parent, int baseLength,
+			changeEpsilonScheme inc2, double incFactor2,
+			changeEpsilonScheme dec2, double decFactor2, double potentialEpsilon) {
+		super(point, parent, baseLength);
+		if (potentialEpsilon == 0) {
+			if (parent != null) this.epsilon = parent.epsilon;
+			else
+				epsilon = 1;
+		}
+		else
+			epsilon = potentialEpsilon;
+	}
+
 	public Node getParent() {
 		return parent;
 	}

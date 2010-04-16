@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -26,6 +27,20 @@ public class RRTWorld implements World {
 	
 	protected int w, h;
 	protected Point2D start, goal;
+	
+	public RRTWorld(RRTWorld world) {
+		r = world.r;
+		start = world.start;
+		goal = world.goal;
+		w = world.w;
+		h = world.h;
+		
+		obstacles = new LinkedList<Rectangle2D>();
+		Iterator<Rectangle2D> itr = world.obstacles.iterator();
+		while (itr.hasNext()) {
+			obstacles.add(itr.next());
+		}
+	}
 	
 	public RRTWorld(String file) throws Exception{
 		r = new Random(System.currentTimeMillis());

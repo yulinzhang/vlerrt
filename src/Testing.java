@@ -32,6 +32,7 @@ public class Testing {
 	protected double decFactor;// = .1;
 	private boolean optimize;// = false;
 	private int runtime;
+
 	
 	private List<Stats> stats;
 	
@@ -77,6 +78,7 @@ public class Testing {
 	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world, boolean optimize)  {
 		this(runtime, p, baseLength, pWayPoint, wayPoints, world, optimize, 
 				VLRRTnode.changeEpsilonScheme.Linear, .1, VLRRTnode.changeEpsilonScheme.Linear, .1);
+
 
 	}
 	
@@ -132,7 +134,7 @@ public class Testing {
 				this.optimize = optimize;
 			}
 	
-	private void execSearch(RRTsearch.Algorithm alg, boolean printToScreen) {
+	private void execSearch(RRTsearch.Algorithm alg, boolean printToScreen, boolean replan) {
 		
 		
 		Stats stat = new Stats();
@@ -142,15 +144,14 @@ public class Testing {
 		stat.setBaseLength(baseLength);
 		stat.setpGoal(pGoal);
 		stat.setpWayPoint(pWayPoint);
-				
-		
+
 		switch (alg) {
-			case ERRT: setupERRT(); break;
-			case RRT : setupBasicRRT(); break;
-			case VLRRT : setupVLRRT(); break;
-			case VLERRT : setupVLERRT(); break;
-			case DVLRRT : setupDVLRRT(); break;
-			case DVLERRT : setupDVLERRT(); break;
+			case ERRT: setupERRT(replan); break;
+			case RRT : setupBasicRRT(replan); break;
+			case VLRRT : setupVLRRT(replan); break;
+			case VLERRT : setupVLERRT(replan); break;
+			case DVLRRT : setupDVLRRT(replan); break;
+			case DVLERRT : setupDVLERRT(replan); break;
 		}
 		
 		
@@ -184,6 +185,7 @@ public class Testing {
 		if (printToScreen) {
 			System.out.println("World Coverage: "+stat.getTreeCoverage());
 			System.out.println("Goal Distance: "+stat.getgDistance());
+			//searcher.show();
 		}
 		stat.setnNodes(searcher.getSearchTree().nNodes());
 		stats.add(stat); //Store for future processing.
@@ -191,33 +193,72 @@ public class Testing {
 		//searcher.show();
 		
 		
-		//searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
+		searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
 			
 		
 	}
+
+	private void setupBasicRRT(boolean replan) {
+		
+		Tree t = null;
+		if (replan) {
+			if (searcher != null)
+				t = searcher.getSearchTree();
+		}
+		this.searcher = RRTResearch.basicRRT(world, pGoal, baseLength, optimize);
+		((RRTResearch)searcher).setPrevSearch(t);
 	
-	private void setupBasicRRT() {
-		this.searcher = RRTsearch.basicRRT(world, pGoal, baseLength, optimize);
 	}
 	
-	private void setupERRT() {
-		this.searcher = RRTsearch.ERRT(world, pGoal, baseLength, pWayPoint, wayPoints, optimize);
+	private void setupERRT(boolean replan) {
+		Tree t = null;
+		if (replan) {
+			if (searcher != null)
+				t = searcher.getSearchTree();
+		}
+		this.searcher = RRTResearch.ERRT(world, pGoal, baseLength, pWayPoint, wayPoints, optimize);
+		((RRTResearch)searcher).setPrevSearch(t);
 	}
 	
-	private void setupVLRRT() {
-		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor, optimize);
+	private void setupVLRRT(boolean replan) {
+		Tree t = null;
+		if (replan) {
+			if (searcher != null)
+				t = searcher.getSearchTree();
+		}
+
+		this.searcher = RRTResearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor, optimize);
+		((RRTResearch)searcher).setPrevSearch(t);
 	}
 	
-	private void setupVLERRT() {
-		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize);
+	private void setupVLERRT(boolean replan) {
+		Tree t = null;
+		if (replan) {
+			if (searcher != null)
+				t = searcher.getSearchTree();
+		}
+		this.searcher = RRTResearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize);
+		((RRTResearch)searcher).setPrevSearch(t);
 	}
 	
-	private void setupDVLRRT() {
-		this.searcher = RRTsearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor, optimize);
+	private void setupDVLRRT(boolean replan) {
+		Tree t = null;
+		if (replan) {
+			if (searcher != null)
+				t = searcher.getSearchTree();
+		}
+		this.searcher = RRTResearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor, optimize);
+		((RRTResearch)searcher).setPrevSearch(t);
 	}
 	
-	private void setupDVLERRT() {
-		this.searcher = RRTsearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize);
+	private void setupDVLERRT(boolean replan) {
+		Tree t = null;
+		if (replan) {
+			if (searcher != null)
+				t = searcher.getSearchTree();
+		}
+		this.searcher = RRTResearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize);
+		((RRTResearch)searcher).setPrevSearch(t);
 	}
 
 	
@@ -229,12 +270,24 @@ public class Testing {
 		return rng.nextBoolean()? rng.nextInt((int)(height*0.1)) : -(rng.nextInt((int)(height*0.1)));
 	}
 	
-	private void changeWorld() {
+	private void advanceStart() {
+		Node n = searcher.getSearchTree().closestTo(world.goal());
+		Node prev = null;
+		while( !n.isRoot() ){
+			prev = n;
+			n = n.getParent();
+		}
 		
+		world.setStart(prev.getPoint());
+		
+	}
+	
+	private void changeWorld() {
+		World newWorld = new RRTWorld((RRTWorld)world);
 		Random rng = new Random(System.nanoTime());
-		Iterator<Rectangle2D> obsItr = world.obstacles().iterator();
-		int width = world.width();
-		int height = world.height();
+		Iterator<Rectangle2D> obsItr = newWorld.obstacles().iterator();
+		int width = newWorld.width();
+		int height = newWorld.height();
 		
 		while (obsItr.hasNext()) {
 			Rectangle2D obstacle = obsItr.next();
@@ -263,9 +316,7 @@ public class Testing {
 				
 			}
 		}
-		
-		
-		
+		this.world = newWorld;		
 	}
 	
 
@@ -305,7 +356,7 @@ public class Testing {
 	public void execNRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen) {
 		
 		for (int i=0;i<n;i++) {
-			execSearch(alg,printToScreen);
+			execSearch(alg,printToScreen,false);
 			//changeWorld();
 		}
 		if (printToScreen) 
@@ -319,6 +370,16 @@ public class Testing {
 		execNRuns(n, alg, false);
 	}
 	
+	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen) {
+		for (int i=0;i<n;i++) {
+			execSearch(alg,printToScreen, true);
+			changeWorld(); 
+			advanceStart();
+		
+		}
+	}
+	
+	
 	public RRTsearch getSearcher(){
 		return this.searcher;
 	}
@@ -329,13 +390,14 @@ public class Testing {
 
 	public static void main(String[] args) throws Exception{
 
-		Testing test = new Testing(50,20, 10, 0, null, new RRTWorld("worlds/big_barrier")); //
+		Testing test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered")); //
 
 		
-		test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
-		test.execNRuns(50,RRTsearch.Algorithm.VLRRT,true);
-		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT,true);
-		test.printStats("stats_bb_50_20_10_", true);
+		//test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
+		test.execNReRuns(10,RRTsearch.Algorithm.VLERRT,true);
+		//test.execNRuns(50,RRTsearch.Algorithm.DVLRRT,true);
+		//test.printStats("stats_bb_50_20_10_", true);
+		
 		
 		/*test = new Testing(50,40, 15, 0, null, 1, new RRTWorld("worlds/big_barrier_redux")); //
 

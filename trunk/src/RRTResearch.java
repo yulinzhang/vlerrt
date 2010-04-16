@@ -280,6 +280,7 @@ public class RRTResearch extends RRTsearch {
 		
 	}
 	
+	
 	private Node getNewNode(Point2D point, Node parent) {
 		switch(type) {
 		case RRT: 

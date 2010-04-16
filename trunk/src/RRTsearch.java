@@ -1,4 +1,5 @@
 import java.awt.geom.Point2D;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -374,6 +375,17 @@ public class RRTsearch {
 			
 			start = start.getParent();  //next node to try to optimize
 		} while (start.getParent() != null);	
+	}
+	
+	public LinkedList<Node> collectBestPlan() {
+		LinkedList<Node> l = new LinkedList<Node>();
+		Node g = searchTree.closestTo(w.goal());
+		while (!g.isRoot()) {
+			l.addFirst(g);
+			g = g.getParent();	
+		}
+		l.addFirst(g);
+		return l;
 	}
 	
 }

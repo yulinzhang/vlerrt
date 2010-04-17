@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 public class RRTsearchPausing extends RRTsearch {
 
 	private boolean nextStep = true;
-	private boolean done = false;
+	//private boolean done = false;
 	private PausingGUI gui;
 	
 	public boolean isNextStep() {

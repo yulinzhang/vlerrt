@@ -13,9 +13,7 @@ public class PausingGUI extends GUI implements ActionListener {
 
 
 
-	public PausingGUI(RRTsearchPausing search){
-		
-		
+	public PausingGUI(RRTsearchPausing search){	
 		super(search.getWorld(), search.getSearchTree(), true);
 		this.search = search; 
 		doneButton = new JButton("Exit");

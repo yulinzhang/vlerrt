@@ -1,5 +1,6 @@
 import java.awt.geom.Point2D;
 import java.util.List;
+import java.util.SortedMap;
 
 
 
@@ -29,111 +30,115 @@ public class RRTResearch extends RRTsearch {
 	private averageStrat strat;
 
 	public static RRTsearch basicRRT(World w, int p, int baseLength) {
-		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.RRT);
+		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.RRT, 5);
 	}
 	
 	public static RRTsearch ERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints) {
-		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.ERRT);
+		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.ERRT, 5);
 	}
 
 	public static RRTsearch VLRRT(World w, int p, int baseLength) {
-		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.VLRRT);
+		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.VLRRT, 5);
 	}
 	
-	public static RRTsearch VLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints) {
-		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT);
+	public static RRTsearch VLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, int nClosest) {
+		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT, nClosest);
 	}
 	
 	public static RRTsearch DVLRRT(World w, int p, int baseLength) {
-		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.DVLRRT);
+		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.DVLRRT, 5);
 	}
 	
-	public static RRTsearch DVLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints) {
-		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.DVLERRT);
+	public static RRTsearch DVLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, int nClosest) {
+		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.DVLERRT, nClosest);
 	}
 
 	public static RRTsearch VLRRT(World w, int p, int baseLength, 
 			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.VLRRT, inc, incFactor, dec, decFactor);
+		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.VLRRT, inc, incFactor, dec, decFactor, 5);
 	}
 	
 	public static RRTsearch VLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, 
-			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT, inc, incFactor, dec, decFactor);
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, int nClosest) {
+		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT, inc, incFactor, dec, decFactor, nClosest);
 	}
 	
 	public static RRTsearch DVLRRT(World w, int p, int baseLength, 
 			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.DVLRRT, inc, incFactor, dec, decFactor);
+		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.DVLRRT, inc, incFactor, dec, decFactor, 5);
 	}
 	
 	public static RRTsearch DVLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, 
-			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor) {
-		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.DVLERRT, inc, incFactor, dec, decFactor);
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, int nClosest) {
+		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.DVLERRT, inc, incFactor, dec, decFactor, nClosest);
 	}
 	
 	//Optimization parameters
 	public static RRTsearch basicRRT(World w, int p, int baseLength, boolean optimize) {
-		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.RRT, null, 0 ,null, 0, optimize);
+		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.RRT, null, 0 ,null, 0, optimize, 5);
 	}
 	
 	public static RRTsearch ERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, boolean optimize) {
-		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.ERRT, null, 0, null, 0, optimize);
+		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.ERRT, null, 0, null, 0, optimize, 5);
 	}
 	
 	public static RRTsearch VLRRT(World w, int p, int baseLength, 
 			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize) {
-		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.VLRRT, inc, incFactor, dec, decFactor, optimize);
+		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.VLRRT, inc, incFactor, dec, decFactor, optimize, 5);
 	}
 	
 	public static RRTsearch VLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, 
-			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize) {
-		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT, inc, incFactor, dec, decFactor, optimize);
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize, int nClosest) {
+		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT, inc, incFactor, dec, decFactor, optimize, nClosest);
 	}
 	
 	public static RRTsearch DVLRRT(World w, int p, int baseLength, 
 			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize) {
-		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.DVLRRT, inc, incFactor, dec, decFactor, optimize);
+		return new RRTResearch(w, p, baseLength, null, 0, Algorithm.DVLRRT, inc, incFactor, dec, decFactor, optimize,5);
 	}
 	
 	public static RRTsearch DVLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, 
-			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize) {
-		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.DVLERRT, inc, incFactor, dec, decFactor, optimize);
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize, int nClosest) {
+		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.DVLERRT, inc, incFactor, dec, decFactor, optimize, nClosest);
 	}
 	
 	//Replanning VLERRT Strategies
 
 	
 	public static RRTsearch VLERRT(World w, int pGoal, int baseLength, int pWayPoint, List<Node> wayPoints, 
-			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize, RRTResearch.averageStrat strat) {
-		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT, inc, incFactor, dec, decFactor, optimize, strat);
+			VLRRTnode.changeEpsilonScheme inc, double incFactor,VLRRTnode.changeEpsilonScheme dec, double decFactor, boolean optimize, RRTResearch.averageStrat strat, int nClosest) {
+		return new RRTResearch(w, pGoal, baseLength, wayPoints, pWayPoint, Algorithm.VLERRT, inc, incFactor, dec, decFactor, optimize, strat, nClosest);
 	}
 	
 
 	public RRTResearch(World w, int pGoal, int baseLength,
-			List<Node> wayPoints, int pWayPoint, Algorithm type) {
+			List<Node> wayPoints, int pWayPoint, Algorithm type, int nClosest) {
 		super(w, pGoal, baseLength, wayPoints, pWayPoint, type);
 		this.strat = averageStrat.Simple;
 		this.dThreshold = (w.height()*w.width())*(RRTResearch.thresholdFactor);
+		this.nClosest = nClosest;
+
 	
 	}
 	
 	public RRTResearch(World w, int pGoal, int baseLength,
-			List<Node> wayPoints, int pWayPoint, Algorithm type , RRTResearch.averageStrat strat) {
+			List<Node> wayPoints, int pWayPoint, Algorithm type , RRTResearch.averageStrat strat, int nClosest) {
 		super(w, pGoal, baseLength, wayPoints, pWayPoint, type);
 		this.strat = strat;
 		this.dThreshold = (w.height()*w.width())*(RRTResearch.thresholdFactor);
+		this.nClosest = nClosest;
 	
 	}
 
 	public RRTResearch(World w, int pGoal, int baseLength,
 			List<Node> wayPoints, int pWayPoint, Algorithm type,
 			VLRRTnode.changeEpsilonScheme inc, double incFactor, VLRRTnode.changeEpsilonScheme dec,
-			double decFactor) {
+			double decFactor, int nClosest) {
 		super(w, pGoal, baseLength, wayPoints, pWayPoint, type, inc, incFactor,
 				dec, decFactor);
 		this.strat = averageStrat.Simple;
 		this.dThreshold = (w.height()*w.width())*(RRTResearch.thresholdFactor);
+		this.nClosest = nClosest;
 	}
 
 
@@ -141,21 +146,23 @@ public class RRTResearch extends RRTsearch {
 	public RRTResearch(World w, int pGoal, int baseLength,
 			List<Node> wayPoints, int pWayPoint, Algorithm type,
 			VLRRTnode.changeEpsilonScheme inc, double incFactor, VLRRTnode.changeEpsilonScheme dec,
-			double decFactor, RRTResearch.averageStrat strat) {
+			double decFactor, RRTResearch.averageStrat strat, int nClosest) {
 		super(w, pGoal, baseLength, wayPoints, pWayPoint, type, inc, incFactor,
 				dec, decFactor);
 		this.strat = strat;
 		this.dThreshold = (w.height()*w.width())*(RRTResearch.thresholdFactor);
+		this.nClosest = nClosest;
 	}
 
 	public RRTResearch(World w, int pGoal, int baseLength,
 			List<Node> wayPoints, int pWayPoint, Algorithm type,
 			VLRRTnode.changeEpsilonScheme inc, double incFactor, VLRRTnode.changeEpsilonScheme dec,
-			double decFactor, boolean optimize) {
+			double decFactor, boolean optimize, int nClosest) {
 		super(w, pGoal, baseLength, wayPoints, pWayPoint, type, inc, incFactor,
 				dec, decFactor, optimize);
 		this.strat = averageStrat.Simple;
 		this.dThreshold = (w.height()*w.width())*(RRTResearch.thresholdFactor);
+		this.nClosest = nClosest;
 	
 	}
 
@@ -163,11 +170,12 @@ public class RRTResearch extends RRTsearch {
 	public RRTResearch(World w, int pGoal, int baseLength,
 			List<Node> wayPoints, int pWayPoint, Algorithm type,
 			VLRRTnode.changeEpsilonScheme inc, double incFactor, VLRRTnode.changeEpsilonScheme dec,
-			double decFactor, boolean optimize, RRTResearch.averageStrat strat) {
+			double decFactor, boolean optimize, RRTResearch.averageStrat strat, int nClosest) {
 		super(w, pGoal, baseLength, wayPoints, pWayPoint, type, inc, incFactor,
 				dec, decFactor, optimize);
 		this.strat = strat;
 		this.dThreshold = (w.height()*w.width())*(RRTResearch.thresholdFactor);
+		this.nClosest = nClosest;
 	
 	}
 	
@@ -176,6 +184,34 @@ public class RRTResearch extends RRTsearch {
 	private Node[] potentialNeighbours(Point2D point, int nClosest) {
 		return prevSearch.nClosestTo(point, nClosest);
 	}
+	
+	
+	private DirectionalEpsilonMap calculateMap(Point2D point, Node[] potentialNeighbs) { //For DVLRRT
+		
+		if (potentialNeighbs.length == 0)
+			return null;
+		
+		DirectionalEpsilonMap res = new DirectionalEpsilonMap();
+		double distance = 0.0;
+		
+		for (int i=0;i<potentialNeighbs.length;i++) {
+			Node current = potentialNeighbs[i];
+			if (current instanceof DVLRRTnode) {
+				distance += point.distance(current.getPoint());
+				double dirNP = DVLRRTnode.computeAngle(current.getPoint(), point);
+				double epsCurrent = current.getExtensionLength(dirNP);
+				res.setEpsilon(DVLRRTnode.computeAngle(point, current.getPoint()), epsCurrent);
+			}
+		}
+		
+		if ((distance/potentialNeighbs.length) > dThreshold)
+			return null;
+		else
+			return res;
+		
+		
+	}
+	
 	
 	//SimpleAvg of all epsilons of neighbors
 	private double calculateAvgEpsilon(Point2D point, Node[] potentialNeighbs) {
@@ -195,7 +231,7 @@ public class RRTResearch extends RRTsearch {
 			}
 		}
 		
-		if ((distance/potentialNeighbs.length) < dThreshold)
+		if ((distance/potentialNeighbs.length) > dThreshold)
 			return 0;
 		else
 			return (res/potentialNeighbs.length);
@@ -216,7 +252,7 @@ public class RRTResearch extends RRTsearch {
 				res += (((VLRRTnode)current).epsilon * (distance += point.distance(current.getPoint())));
 			}
 		}
-		if ((distance/potentialNeighbs.length) < dThreshold)
+		if ((distance/potentialNeighbs.length) > dThreshold)
 			return 0;
 		else
 			return (res/(potentialNeighbs.length * distance));
@@ -308,7 +344,14 @@ public class RRTResearch extends RRTsearch {
 		}
 		case DVLRRT:
 		case DVLERRT:
-			return new DVLRRTnode(point, (DVLRRTnode) parent, baseLength, inc, incFactor, dec, decFactor);
+			DirectionalEpsilonMap m = null;
+			Node[] neighbs;
+			if (prevSearch != null) {
+				neighbs = potentialNeighbours(point,nClosest);
+				if (neighbs != null)
+					m = calculateMap(point, neighbs);
+			}
+			return new DVLRRTnode(point, (DVLRRTnode) parent, baseLength, inc, incFactor, dec, decFactor, m);
 		}
 		return null;  //exception
 	}

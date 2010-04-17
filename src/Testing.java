@@ -17,7 +17,7 @@ public class Testing {
 	
 /* Class for testing and evaluating the RRT algorithms */
 	
-	private final double PROB_CHANGE_OBSTACLE = 0.2;
+	private final double PROB_CHANGE_OBSTACLE = 0.05;
 	
 	private RRTsearch searcher;
 	
@@ -134,7 +134,7 @@ public class Testing {
 				this.optimize = optimize;
 			}
 	
-	private void execSearch(RRTsearch.Algorithm alg, boolean printToScreen, boolean replan, RRTResearch.averageStrat strat) {
+	private void execSearch(RRTsearch.Algorithm alg, boolean printToScreen, boolean replan, RRTResearch.averageStrat strat, int nClosest) {
 		
 		
 		Stats stat = new Stats();
@@ -149,9 +149,9 @@ public class Testing {
 			case ERRT: setupERRT(replan); break;
 			case RRT : setupBasicRRT(replan); break;
 			case VLRRT : setupVLRRT(replan); break;
-			case VLERRT : setupVLERRT(replan,strat); break;
+			case VLERRT : setupVLERRT(replan,strat,nClosest); break;
 			case DVLRRT : setupDVLRRT(replan); break;
-			case DVLERRT : setupDVLERRT(replan); break;
+			case DVLERRT : setupDVLERRT(replan,nClosest); break;
 		}
 		
 		
@@ -231,13 +231,13 @@ public class Testing {
 		((RRTResearch)searcher).setPrevSearch(t);
 	}
 	
-	private void setupVLERRT(boolean replan, RRTResearch.averageStrat strat) {
+	private void setupVLERRT(boolean replan, RRTResearch.averageStrat strat, int nClosest) {
 		Tree t = null;
 		if (replan) {
 			if (searcher != null)
 				t = searcher.getSearchTree();
 		}
-		this.searcher = RRTResearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize, strat);
+		this.searcher = RRTResearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize, strat, nClosest);
 		((RRTResearch)searcher).setPrevSearch(t);
 	}
 	
@@ -251,13 +251,13 @@ public class Testing {
 		((RRTResearch)searcher).setPrevSearch(t);
 	}
 	
-	private void setupDVLERRT(boolean replan) {
+	private void setupDVLERRT(boolean replan, int nClosest) {
 		Tree t = null;
 		if (replan) {
 			if (searcher != null)
 				t = searcher.getSearchTree();
 		}
-		this.searcher = RRTResearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize);
+		this.searcher = RRTResearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize, nClosest);
 		((RRTResearch)searcher).setPrevSearch(t);
 	}
 
@@ -277,9 +277,19 @@ public class Testing {
 			prev = n;
 			n = n.getParent();
 		}
+		if (prev == null) //In this case, we are already at the goal, return the goal?
+			world.setStart(n.getPoint());
+		else
+			world.setStart(prev.getPoint());
 		
-		world.setStart(prev.getPoint());
-		
+	}
+	
+	private void advanceStart(int n) {
+		LinkedList<Node> l = searcher.collectBestPlan();
+		if (l.size() < n)
+			world.setStart(l.getLast().getPoint());
+		else
+			world.setStart(l.get(n).getPoint());
 	}
 	
 	public List<Node> genWaypoints(int nWaypoints) {
@@ -367,7 +377,7 @@ public class Testing {
 	public void execNRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen) {
 		
 		for (int i=0;i<n;i++) {
-			execSearch(alg,printToScreen,false,RRTResearch.averageStrat.Weighted);
+			execSearch(alg,printToScreen,false,RRTResearch.averageStrat.Weighted, 5);
 			//changeWorld();
 		}
 		if (printToScreen) 
@@ -379,17 +389,18 @@ public class Testing {
 	
 	public void execNRuns(int n, RRTsearch.Algorithm alg) {
 		for (int i=0;i<n;i++) {
-			execSearch(alg,false,false,RRTResearch.averageStrat.Weighted);
+			execSearch(alg,false,false,RRTResearch.averageStrat.Weighted, 5);
 			//changeWorld();
 		}
 	}
 	
-	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen, RRTResearch.averageStrat strat, int nWaypoints) {
+	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen, RRTResearch.averageStrat strat, int nWaypoints, int nClosest) {
 		for (int i=0;i<n;i++) {
-			execSearch(alg,printToScreen, true, strat);
+			execSearch(alg,printToScreen, true, strat, nClosest);
 			//changeWorld(); 
-			advanceStart();
+			advanceStart(2);
 			wayPoints = genWaypoints(nWaypoints);
+
 		}
 	}
 	
@@ -408,7 +419,7 @@ public class Testing {
 
 		
 		//test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
-		test.execNReRuns(50,RRTsearch.Algorithm.ERRT,true, RRTResearch.averageStrat.Weighted,10);
+		test.execNReRuns(50,RRTsearch.Algorithm.DVLERRT,true, RRTResearch.averageStrat.Weighted,10, 10);
 		//test.execNRuns(50,RRTsearch.Algorithm.DVLRRT,true);
 		//test.printStats("stats_bb_50_20_10_", true);
 		

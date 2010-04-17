@@ -157,7 +157,7 @@ public class DVLRRTnode extends VLRRTnode {
 	 */
 	private static double computeAngle(Point2D origin, Point2D dest) {
 		double xDelta = dest.getX() - origin.getX();
-		double yDelta =  dest.getY() - origin.getY();
+		double yDelta = -(dest.getY() - origin.getY());
 
 		if (xDelta == 0) {
 			if (yDelta > 0) return Math.PI/2;
@@ -200,28 +200,28 @@ public class DVLRRTnode extends VLRRTnode {
 		
 		//Test compute angle
 		Point2D origin = new Point2D.Double(0,0);
-//		Point2D right = new Point2D.Double(1,0);
-//		Point2D q1 = new Point2D.Double(1,1);
-//		Point2D up = new Point2D.Double(0,1);
-//		Point2D q2 = new Point2D.Double(-1,1);
-//		Point2D left = new Point2D.Double(-1,0);
-//		Point2D q3 = new Point2D.Double(-1,-1);
-//		Point2D down = new Point2D.Double(0,-1);
-//		Point2D q4 = new Point2D.Double(1,-1);
-//		
-//		System.out.println(computeAngle(origin,right)); // 0 
-//		System.out.println(computeAngle(origin,q1));
-//		System.out.println(computeAngle(origin,up));
-//		System.out.println(computeAngle(origin,q2));
-//		System.out.println(computeAngle(origin,left));
-//		System.out.println(computeAngle(origin,q3));
-//		System.out.println(computeAngle(origin,down));
-//		System.out.println(computeAngle(origin,q4));	
+		Point2D right = new Point2D.Double(1,0);
+		Point2D q1 = new Point2D.Double(1,1);
+		Point2D up = new Point2D.Double(0,1);
+		Point2D q2 = new Point2D.Double(-1,1);
+		Point2D left = new Point2D.Double(-1,0);
+		Point2D q3 = new Point2D.Double(-1,-1);
+		Point2D down = new Point2D.Double(0,-1);
+		Point2D q4 = new Point2D.Double(1,-1);
+		
+		System.out.println(computeAngle(origin,right)); // 0 
+		System.out.println(computeAngle(origin,q1));
+		System.out.println(computeAngle(origin,up));
+		System.out.println(computeAngle(origin,q2));
+		System.out.println(computeAngle(origin,left));
+		System.out.println(computeAngle(origin,q3));
+		System.out.println(computeAngle(origin,down));
+		System.out.println(computeAngle(origin,q4));	
 		
 		//test the node and epsilon maps
-		DVLRRTnode parent = new DVLRRTnode(origin, null, 10);
-		DirectionalEpsilonMap test = parent.new DirectionalEpsilonMap();
-		test.testDirEps();
+//		DVLRRTnode parent = new DVLRRTnode(origin, null, 10);
+//		DirectionalEpsilonMap test = parent.new DirectionalEpsilonMap();
+//		test.testDirEps();
 		
 
 		

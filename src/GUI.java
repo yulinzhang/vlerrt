@@ -118,11 +118,11 @@ public class GUI extends JPanel {
 			//all rrt paths
 			g.setColor(ALL_PATH);
 			for( Node n : tree){
-				if (halo) {
-					g.setColor(HALO);
-					drawHalo(g, n);
-					g.setColor(ALL_PATH);
-				}
+//				if (halo) {
+//					g.setColor(HALO);
+//					drawHalo(g, n);
+//					g.setColor(ALL_PATH);
+//				}
 				
 				if( n.isRoot() )
 					continue;
@@ -135,6 +135,9 @@ public class GUI extends JPanel {
 			//the best path
 			g.setColor(PATH);
 			Node goal = tree.closestTo(world.goal());
+			g.setColor(HALO);
+			drawHalo(g, goal);
+			g.setColor(PATH);
 			while( !goal.isRoot() ){
 				Node parent_node = goal.getParent();
 				Point2D leaf = goal.getPoint();
@@ -154,14 +157,17 @@ public class GUI extends JPanel {
 
 	public void drawHalo(Graphics2D g, Node n) {
 		Point2D nodePoint = n.getPoint();
+		double x = nodePoint.getX();
+		double y = nodePoint.getY();
 		double extLength, deltaX, deltaY;
-		for(int angle = 0; angle < 360; angle += 5) {
-			extLength = n.getExtensionLength(angle);
-			deltaX = extLength*Math.cos(angle*2*Math.PI/360);
-			deltaY = extLength*Math.sin(angle*2*Math.PI/360);
+		for(int angle = 0; angle < 360; angle += 1) {
+			double angleRad = angle*2*Math.PI/360;
+			extLength = n.getExtensionLength(angleRad);
+			deltaX = extLength*Math.cos(angleRad);
+			deltaY = extLength*Math.sin(angleRad);
 			
-			g.draw(new Ellipse2D.Double(nodePoint.getX() + deltaX,
-					nodePoint.getY() + deltaY, 2, 2));
+			g.draw(new Ellipse2D.Double(x + deltaX-2,  //x coord adjusted to make upper left corner
+					y - deltaY-2, 2, 2));  //y directions reversed, adjust to make upper left corner
 		}
 	}
 	

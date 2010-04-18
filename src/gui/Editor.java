@@ -11,7 +11,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
@@ -19,11 +18,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 
+import nodeTypes.RRTWorld;
+import rrt.Search;
 import rrt.Tree;
 import rrt.World;
-import rrtImpl.RRTWorld;
-import search.RRTsearch;
-import search.RRTsearch.Algorithm;
 import testing.Testing;
 
 
@@ -113,9 +111,9 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 
 					Testing search = new Testing(50,20, 10, 0, null, world);
 
-					search.execNRuns(1,RRTsearch.Algorithm.RRT);
+					search.execNRuns(1,Search.Algorithm.RRT);
 
-					search.printStats("editorOut",false);//FIXME: halting bug.
+					search.printStats("editorOut");//FIXME: halting bug.
 					
 					JDialog dialog = new JDialog();
 					dialog.add(new GUI(world,search.getSearcher().getSearchTree()));

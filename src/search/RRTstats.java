@@ -1,10 +1,17 @@
-package testing;
+package search;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+
 import rrt.Node;
-import search.RRTsearch;
-import search.RRTsearch.Algorithm;
+import rrt.Search;
+import rrt.Stats;
 
 
-public class Stats {
+public class RRTstats implements Stats {
 
 	private int nIterations;
 	private int nNodes;
@@ -23,7 +30,7 @@ public class Stats {
 
 
 
-	RRTsearch.Algorithm alg;
+	Search.Algorithm alg;
 	long runtime;
 
 	@Override
@@ -36,10 +43,10 @@ public class Stats {
 				(gDistance/treeCoverage) + " \t " + (goalFTime-initTime);
 	}
 	
-	public Stats() {}
+	public RRTstats() {}
 
-	public Stats(int nIterations, int nNodes, boolean goalFound,
-			double gDistance, double treeCoverage, int wHeight, int wWidth, RRTsearch.Algorithm alg, long runtime) {
+	public RRTstats(int nIterations, int nNodes, boolean goalFound,
+			double gDistance, double treeCoverage, int wHeight, int wWidth, Search.Algorithm alg, long runtime) {
 		this.nIterations = nIterations;
 		this.nNodes = nNodes;
 		this.goalFound = goalFound;
@@ -51,17 +58,13 @@ public class Stats {
 		this.runtime = runtime;
 	}
 
-
-
 	public long getInitTime() {
 		return initTime;
 	}
 
-
 	public void setInitTime(long initTime) {
 		this.initTime = initTime;
 	}
-
 
 	public long getGoalFTime() {
 		return goalFTime;
@@ -71,7 +74,6 @@ public class Stats {
 		return goalFTime-initTime;
 	}
 
-
 	public void setGoalFTime(long goalFTime) {
 		this.goalFTime = goalFTime;
 	}
@@ -80,20 +82,14 @@ public class Stats {
 		this.nIterations = nIterations;
 	}
 
-
-
 	public void setnNodes(int nNodes) {
 		this.nNodes = nNodes;
 	}
-
-
 
 	public void setGoalFound(boolean goalFound) {
 		this.goalFound = goalFound;
 	}
 
-	
-	
 	public void setgDistance(double gDistance) {
 		this.gDistance = gDistance;
 	}
@@ -111,67 +107,45 @@ public class Stats {
 		this.treeCoverage += treeCoverage;
 	}
 
-
-
 	public void setwHeight(int wHeight) {
 		this.wHeight = wHeight;
 	}
-
-
 
 	public void setwWidth(int wWidth) {
 		this.wWidth = wWidth;
 	}
 
-
-
-	public void setAlg(RRTsearch.Algorithm alg) {
+	public void setAlg(Search.Algorithm alg) {
 		this.alg = alg;
 	}
-
-
 
 	public void setRuntime(long runtime) {
 		this.runtime = runtime;
 	}
 
-
-
 	public int getnIterations() {
 		return nIterations;
 	}
-
-
 
 	public int getnNodes() {
 		return nNodes;
 	}
 
-
-
 	public boolean isGoalFound() {
 		return goalFound;
 	}
-
-
 
 	public double getgDistance() {
 		return gDistance;
 	}
 
-
-
 	public double getTreeCoverage() {
 		return treeCoverage;
 	}
 
-
-
 	public int getwHeight() {
 		return wHeight;
 	}
-
-
 
 	public int getwWidth() {
 		return wWidth;
@@ -181,36 +155,29 @@ public class Stats {
 		return pGoal;
 	}
 
-
 	public void setpGoal(int pGoal) {
 		this.pGoal = pGoal;
 	}
-
 
 	public int getBaseLength() {
 		return baseLength;
 	}
 
-
 	public void setBaseLength(int baseLength) {
 		this.baseLength = baseLength;
 	}
-
 
 	public int getpWayPoint() {
 		return pWayPoint;
 	}
 
-
 	public void setpWayPoint(int pWayPoint) {
 		this.pWayPoint = pWayPoint;
 	}
 
-
-	public RRTsearch.Algorithm getAlg() {
+	public Search.Algorithm getAlg() {
 		return alg;
 	}
-
 
 	public long getRuntime() {
 		return runtime;
@@ -223,6 +190,4 @@ public class Stats {
 	public Node getGoal() {
 		return goal;
 	}	
-	
-	
 }

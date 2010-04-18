@@ -13,11 +13,11 @@ import search.RRTsearchPausing;
 public class PausingGUI extends GUI implements ActionListener {
 
 	protected JButton doneButton, stepButton;
-	protected RRTsearchPausing search;
+	protected PausingSearch search;
 
 
 
-	public PausingGUI(RRTsearchPausing search){	
+	public PausingGUI(PausingSearch search){	
 		super(search.getWorld(), search.getSearchTree(), true);
 		this.search = search; 
 		doneButton = new JButton("Exit");
@@ -40,10 +40,9 @@ public class PausingGUI extends GUI implements ActionListener {
 		
 	}
 
-
 	public void actionPerformed(ActionEvent e) {
 		if ("end".equals(e.getActionCommand())) {
-			search.setDone(true);
+			search.setExit(true);
 		} else {
 			search.setNextStep(true);
 		}	

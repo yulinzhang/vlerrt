@@ -1,3 +1,5 @@
+package testing;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
@@ -12,6 +14,18 @@ import java.util.List;
 import java.util.Random;
 
 import javax.swing.Timer;
+
+
+import rrt.Node;
+import rrt.Tree;
+import rrt.World;
+import rrtImpl.RRTWorld;
+import rrtImpl.VLRRTnode;
+import rrtImpl.VLRRTnode.changeEpsilonScheme;
+import search.RRTResearch;
+import search.RRTsearch;
+import search.RRTResearch.averageStrat;
+import search.RRTsearch.Algorithm;
 
 public class Testing { 
 	

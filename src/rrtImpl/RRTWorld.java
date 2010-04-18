@@ -1,3 +1,6 @@
+package rrtImpl;
+import gui.GUI;
+
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -9,6 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+
+import rrt.World;
 
 /*
  *  intersects with the INTERIOR of the rectangle (*NOT* its border)
@@ -149,7 +154,7 @@ public class RRTWorld implements World {
 		return h;
 	}
 
-	public Iterable<Rectangle2D> obstacles() {
+	public List<Rectangle2D> obstacles() {
 		return obstacles;
 	}
 

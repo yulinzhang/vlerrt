@@ -1,6 +1,19 @@
+package search;
+
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.SortedMap;
+
+
+import rrt.Node;
+import rrt.Tree;
+import rrt.World;
+import rrtImpl.DVLRRTnode;
+import rrtImpl.DirectionalEpsilonMap;
+import rrtImpl.RRTnode;
+import rrtImpl.VLRRTnode;
+import rrtImpl.VLRRTnode.changeEpsilonScheme;
+import testing.Stats;
 
 
 

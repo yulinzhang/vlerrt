@@ -1,0 +1,72 @@
+
+World handling:
+   - 'Customized' generation of worlds (text file parsing, random, etc.)
+      X Read/write worlds from file.
+   X Separating drawing from world info.
+   - Preserving worlds between iterations.
+   - Timer-based iterations...
+   X Collisions with the world barriers.
+   X Maybe a simple (manual) world editor?
+   
+   
+ Distance update:
+ 
+ Each point carries information about its distance factor.
+ 
+ The distance factor has a value between 0 and \Top.
+ 
+ Search has methods to give you the next increase and next decrease
+ 	- Linear / Log / Exponential.
+ 	
+ If collision 
+ 	decrease
+ else
+ 	increase
+ 	
+Use the "complex" KD tree that allows distance. 	
+ 	
+ --------------
+ 
+ Testing & Evaluation:
+ 
+  - Write up the several worlds.
+  - Run a search for a X amount of time
+  - Parameters
+     - Starting value for epsilon
+     - Starting value for d'
+     - Run time
+
+  - "Parse" the search 
+  		- Found the goal or we didnt
+  		- Number of nodes in the tree
+  		- World coverage (distance travelled?)
+
+  - "Shake up" the world for replanning
+  
+ 
+    (x,y) ------- (x+w,y)
+    |                |
+    |                |
+    (x,y+h) ------ (x+w,y+h)
+    
+World File Format (all ints):
+Width \t Height
+START
+GOAL
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+x \t y \t w \t h \n (Upper left corner)
+
+
+
+
+  
+ 	
+     
+ 
+ 
+ 

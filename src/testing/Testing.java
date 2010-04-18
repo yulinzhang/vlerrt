@@ -14,9 +14,12 @@ import java.util.Random;
 
 import javax.swing.Timer;
 
+import com.savarese.spatial.Point;
+
 import rrt.Node;
 import rrt.Tree;
 import rrt.World;
+import rrtImpl.DVLRRTnode;
 import rrtImpl.RRTWorld;
 import rrtImpl.VLRRTnode;
 import search.RRTResearch;
@@ -279,19 +282,7 @@ public class Testing {
 	}
 	
 	
-	private void advanceStart() {
-		Node n = searcher.getSearchTree().closestTo(world.goal());
-		Node prev = null;
-		while( !n.isRoot() ){
-			prev = n;
-			n = n.getParent();
-		}
-		if (prev == null) //In this case, we are already at the goal, return the goal?
-			world.setStart(n.getPoint());
-		else
-			world.setStart(prev.getPoint());
-		
-	}
+
 	
 	private void advanceStart(int n) {
 		LinkedList<Node> l = searcher.collectBestPlan();
@@ -301,6 +292,41 @@ public class Testing {
 			world.setStart(l.get(n).getPoint());
 		
 	
+	}
+	
+	private void advanceStart(double d, boolean choose_begin) { //if choose_begin round down, else round up.
+		LinkedList<Node> l = searcher.collectBestPlan();
+		double aux = 0.0;
+		
+		
+		//Find between which 2 points the new start will be:
+		Point2D begin = l.getFirst().getPoint();
+		Point2D end = null;
+		
+		Iterator<Node> itr = l.iterator();
+		itr.next();
+		while (itr.hasNext()) {
+			end = itr.next().getPoint();
+			double inc = begin.distance(end);
+			aux += inc;
+			if (aux >= d) {
+				break; //done
+			}
+			
+			begin = end;
+		}	
+		
+			if (choose_begin)
+				world.setStart(begin);
+			else {
+				if (end != null)
+					world.setStart(end);
+				else
+					world.setStart(begin);
+			}
+		
+		
+		
 	}
 	
 	public List<Node> genWaypoints(int nWaypoints) {
@@ -409,12 +435,13 @@ public class Testing {
 	
 
 	
-	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen, RRTResearch.averageStrat strat, int nWaypoints, int nClosest) {
+	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen, RRTResearch.averageStrat strat, int nWaypoints, int nClosest, boolean changeWorld) {
 		for (int i=0;i<n;i++) {
 			execSearch(alg,printToScreen, true, strat, nClosest);
-			advanceStart(2);
+			advanceStart(25.0, false);
 			wayPoints = genWaypoints(nWaypoints);
-			changeWorld();
+			if (changeWorld)
+				changeWorld();
 
 		}
 	}
@@ -433,16 +460,16 @@ public class Testing {
 		Testing test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world")); //
 
 		
-		//test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
-		test.execNReRuns(100,RRTsearch.Algorithm.DVLERRT,true, null,10, 10);
+//		test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
+		test.execNReRuns(100,RRTsearch.Algorithm.DVLERRT,true, null,10, 10, true);
 		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-		test.execNReRuns(100,RRTsearch.Algorithm.VLERRT,true, RRTResearch.averageStrat.Simple,10, 10);
+		test.execNReRuns(100,RRTsearch.Algorithm.VLERRT,true, RRTResearch.averageStrat.Simple,10, 10, true);
 		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-		test.execNReRuns(100, RRTsearch.Algorithm.ERRT, true, null, 10, 10);
-		//test.execNRuns(50,RRTsearch.Algorithm.DVLRRT,true);
+	    test.execNReRuns(100, RRTsearch.Algorithm.ERRT, true, null, 10, 10, true);
+		
+	    //test.execNRuns(50,RRTsearch.Algorithm.DVLRRT,true);
 		//test.printStats("stats_bb_50_20_10_", true);
-		
-		
+
 		/*test = new Testing(50,40, 15, 0, null, 1, new RRTWorld("worlds/big_barrier_redux")); //
 
 		

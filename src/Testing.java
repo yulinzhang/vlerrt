@@ -1,5 +1,3 @@
-package testing;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
@@ -15,17 +13,14 @@ import java.util.Random;
 
 import javax.swing.Timer;
 
-
 import rrt.Node;
 import rrt.Tree;
 import rrt.World;
 import rrtImpl.RRTWorld;
 import rrtImpl.VLRRTnode;
-import rrtImpl.VLRRTnode.changeEpsilonScheme;
 import search.RRTResearch;
 import search.RRTsearch;
-import search.RRTResearch.averageStrat;
-import search.RRTsearch.Algorithm;
+import testing.Stats;
 
 public class Testing { 
 	
@@ -261,7 +256,7 @@ public class Testing {
 			if (searcher != null)
 				t = searcher.getSearchTree();
 		}
-		this.searcher = RRTResearch.DVLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor, optimize);
+		this.searcher = RRTResearch.VLRRT(world, pGoal, baseLength, inc, incFactor, dec, decFactor, optimize);
 		((RRTResearch)searcher).setPrevSearch(t);
 	}
 	
@@ -271,7 +266,7 @@ public class Testing {
 			if (searcher != null)
 				t = searcher.getSearchTree();
 		}
-		this.searcher = RRTResearch.DVLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize, nClosest);
+		this.searcher = RRTResearch.VLERRT(world, pGoal, baseLength, pWayPoint, wayPoints, inc, incFactor, dec, decFactor, optimize, nClosest);
 		((RRTResearch)searcher).setPrevSearch(t);
 	}
 
@@ -300,7 +295,7 @@ public class Testing {
 	
 	private void advanceStart(int n) {
 		LinkedList<Node> l = searcher.collectBestPlan();
-		if (l.size() <= n)
+		if (l.size() < n)
 			world.setStart(l.getLast().getPoint());
 		else
 			world.setStart(l.get(n).getPoint());
@@ -412,7 +407,7 @@ public class Testing {
 		for (int i=0;i<n;i++) {
 			execSearch(alg,printToScreen, true, strat, nClosest);
 			//changeWorld(); 
-			advanceStart(2);
+			advanceStart(3);
 			wayPoints = genWaypoints(nWaypoints);
 
 		}

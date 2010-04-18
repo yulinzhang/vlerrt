@@ -200,7 +200,6 @@ public class RRTResearch extends RRTsearch {
 	
 	
 	private DirectionalEpsilonMap calculateMap(Point2D point, Node[] potentialNeighbs) { //For DVLRRT
-		
 		if (potentialNeighbs.length == 0)
 			return null;
 		
@@ -217,11 +216,12 @@ public class RRTResearch extends RRTsearch {
 			}
 		}
 		
-		if ((distance/potentialNeighbs.length) > dThreshold)
+		if ((distance/potentialNeighbs.length) > dThreshold) {
 			return null;
-		else
+		}
+		else {
 			return res;
-		
+		}
 		
 	}
 	
@@ -244,8 +244,9 @@ public class RRTResearch extends RRTsearch {
 			}
 		}
 		
-		if ((distance/potentialNeighbs.length) > dThreshold)
+		if ((distance/potentialNeighbs.length) > dThreshold) {
 			return 0;
+		}
 		else
 			return (res/potentialNeighbs.length);
 	}
@@ -265,13 +266,14 @@ public class RRTResearch extends RRTsearch {
 				res += (((VLRRTnode)current).epsilon * (distance += point.distance(current.getPoint())));
 			}
 		}
-		if ((distance/potentialNeighbs.length) > dThreshold)
+		if ((distance/potentialNeighbs.length) > dThreshold) {
 			return 0;
+		}
 		else
 			return (res/(potentialNeighbs.length * distance));
 	}
 	
-	protected Node step(Stats stats) {
+	private Node step(Stats stats) {
 		Point2D toward, destination;
 		Node from;
 		boolean toGoal = false, reachGoal = false;
@@ -316,6 +318,7 @@ public class RRTResearch extends RRTsearch {
 		}	
 	}
 	
+	@Override
 	public int runSearchHalt(Stats stats) {
 		int nItrs = 0;
 		Node next = null;
@@ -328,7 +331,6 @@ public class RRTResearch extends RRTsearch {
 		return nItrs;
 		
 	}
-	
 	
 	private Node getNewNode(Point2D point, Node parent) {
 		switch(type) {
@@ -356,7 +358,7 @@ public class RRTResearch extends RRTsearch {
 			return new VLRRTnode(point, (VLRRTnode) parent, baseLength, inc, incFactor, dec, decFactor, potentialEpsilon);
 		}
 		case DVLRRT:
-		case DVLERRT:
+		case DVLERRT: {
 			DirectionalEpsilonMap m = null;
 			Node[] neighbs;
 			if (prevSearch != null) {
@@ -365,6 +367,7 @@ public class RRTResearch extends RRTsearch {
 					m = calculateMap(point, neighbs);
 			}
 			return new DVLRRTnode(point, (DVLRRTnode) parent, baseLength, inc, incFactor, dec, decFactor, m);
+		}
 		}
 		return null;  //exception
 	}

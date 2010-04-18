@@ -1,5 +1,4 @@
 package testing;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
@@ -15,23 +14,19 @@ import java.util.Random;
 
 import javax.swing.Timer;
 
-
 import rrt.Node;
 import rrt.Tree;
 import rrt.World;
 import rrtImpl.RRTWorld;
 import rrtImpl.VLRRTnode;
-import rrtImpl.VLRRTnode.changeEpsilonScheme;
 import search.RRTResearch;
 import search.RRTsearch;
-import search.RRTResearch.averageStrat;
-import search.RRTsearch.Algorithm;
 
 public class Testing { 
 	
 /* Class for testing and evaluating the RRT algorithms */
 	
-	private final double PROB_CHANGE_OBSTACLE = 0.05;
+	private final double PROB_CHANGE_OBSTACLE = 0.10;
 	
 	private RRTsearch searcher;
 	
@@ -197,8 +192,10 @@ public class Testing {
 			
 		}
 		if (printToScreen) {
-			System.out.println("World Coverage: "+stat.getTreeCoverage());
-			System.out.println("Goal Distance: "+stat.getgDistance());
+			//System.out.println("World Coverage: "+stat.getTreeCoverage());
+			//System.out.println("Goal Distance: "+stat.getgDistance());
+			if (stat.getElapsedTime() > 0)
+				System.out.println("Alg:" +stat.getAlg() + " Runtime: "+stat.getElapsedTime());
 			//searcher.show();
 		}
 		stat.setnNodes(searcher.getSearchTree().nNodes());
@@ -276,13 +273,11 @@ public class Testing {
 	}
 
 	
-	private double getRandomShiftX(Random rng,int width) {
-		return rng.nextBoolean()? rng.nextInt((int)(width*0.1)) : -(rng.nextInt((int)(width*0.1)));
+
+	private double getRandomShift(Random rng, int bound) {
+		return rng.nextBoolean()? rng.nextInt((int)(bound*0.05)) : -(rng.nextInt((int)(bound*0.05)));
 	}
 	
-	private double getRandomShiftY(Random rng, int height) {
-		return rng.nextBoolean()? rng.nextInt((int)(height*0.1)) : -(rng.nextInt((int)(height*0.1)));
-	}
 	
 	private void advanceStart() {
 		Node n = searcher.getSearchTree().closestTo(world.goal());
@@ -304,6 +299,8 @@ public class Testing {
 			world.setStart(l.getLast().getPoint());
 		else
 			world.setStart(l.get(n).getPoint());
+		
+	
 	}
 	
 	public List<Node> genWaypoints(int nWaypoints) {
@@ -317,7 +314,7 @@ public class Testing {
 	}
 	
 	
-	private void changeWorld() { //Needs to be re-done.
+	private void changeWorld() { 
 		World newWorld = new RRTWorld((RRTWorld)world);
 		Random rng = new Random(System.nanoTime());
 		Iterator<Rectangle2D> obsItr = newWorld.obstacles().iterator();
@@ -327,8 +324,9 @@ public class Testing {
 		while (obsItr.hasNext()) {
 			Rectangle2D obstacle = obsItr.next();
 			if (rng.nextDouble() < PROB_CHANGE_OBSTACLE) {
-				double shiftX = getRandomShiftX(rng,width);
-				double shiftY = getRandomShiftY(rng,height);
+				do {
+				double shiftX = getRandomShift(rng,width);
+				double shiftY = getRandomShift(rng,height);
 
 				if (shiftX < 0) {
 					if (obstacle.getX()+shiftX < 0)
@@ -346,8 +344,9 @@ public class Testing {
 							shiftY -= (obstacle.getY()+obstacle.getHeight()+shiftY - height);
 				
 				
+				
 				obstacle.setRect(obstacle.getX()+shiftX, obstacle.getY()+shiftY, obstacle.getWidth(), obstacle.getHeight());
-
+				} while (obstacle.contains(world.goal()) || obstacle.contains(world.start()));
 				
 			}
 		}
@@ -408,12 +407,14 @@ public class Testing {
 		}
 	}
 	
+
+	
 	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen, RRTResearch.averageStrat strat, int nWaypoints, int nClosest) {
 		for (int i=0;i<n;i++) {
 			execSearch(alg,printToScreen, true, strat, nClosest);
-			//changeWorld(); 
 			advanceStart(2);
 			wayPoints = genWaypoints(nWaypoints);
+			changeWorld();
 
 		}
 	}
@@ -429,11 +430,15 @@ public class Testing {
 
 	public static void main(String[] args) throws Exception{
 
-		Testing test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered")); //
+		Testing test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world")); //
 
 		
 		//test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
-		test.execNReRuns(50,RRTsearch.Algorithm.DVLERRT,true, RRTResearch.averageStrat.Weighted,10, 10);
+		test.execNReRuns(100,RRTsearch.Algorithm.DVLERRT,true, null,10, 10);
+		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
+		test.execNReRuns(100,RRTsearch.Algorithm.VLERRT,true, RRTResearch.averageStrat.Simple,10, 10);
+		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
+		test.execNReRuns(100, RRTsearch.Algorithm.ERRT, true, null, 10, 10);
 		//test.execNRuns(50,RRTsearch.Algorithm.DVLRRT,true);
 		//test.printStats("stats_bb_50_20_10_", true);
 		

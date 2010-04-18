@@ -1,4 +1,7 @@
+package rrtImpl;
 import java.awt.geom.Point2D;
+
+import rrt.Node;
 
 /*
  * RRT always extend the same amount

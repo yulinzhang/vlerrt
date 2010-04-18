@@ -1,4 +1,7 @@
+package rrtImpl;
 import java.awt.geom.Point2D;
+
+import rrt.Node;
 /*
  * Variable Length RRT
  * change how far to extend from a given node based on past successes and failures
@@ -6,7 +9,7 @@ import java.awt.geom.Point2D;
 public class VLRRTnode extends RRTnode {
 
 	//Enum to keep track of how to change Epsilon
-	protected enum changeEpsilonScheme {
+	public enum changeEpsilonScheme {
 		Linear,  //increase/decrease epislon by a fixed amount 
 		Mult,  //multiply/divide by a factor
 		Restart;  //reset to 1

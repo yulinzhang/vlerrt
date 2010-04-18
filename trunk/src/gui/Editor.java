@@ -1,3 +1,5 @@
+package gui;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -16,6 +18,14 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
+
+import rrt.Tree;
+import rrt.World;
+import rrtImpl.RRTWorld;
+import search.RRTsearch;
+import search.RRTsearch.Algorithm;
+import testing.Testing;
+
 
 
 @SuppressWarnings("serial")
@@ -128,8 +138,7 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 		}
 		
 		if( m == Mode.DELETE_OBSTACLE ){
-			List<Rectangle2D> list = ((RRTWorld)world).obstacles;
-			Iterator<Rectangle2D> it = list.iterator();
+			Iterator<Rectangle2D> it = world.obstacles().iterator();
 			while( it.hasNext() ){
 				Rectangle2D o = it.next();
 				if( o.contains(point) ){
@@ -167,14 +176,13 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 		if( e.getButton() == MouseEvent.BUTTON1 ){
 			switch(m){
 			case SET_GOAL:
-				((RRTWorld)world).goal = point;
+				world.setGoal(point);
 				break;
 			case SET_START:
-				((RRTWorld)world).start = point;
+				world.setStart(point);
 				break;
 			case DELETE_OBSTACLE:
-				List<Rectangle2D> list = ((RRTWorld)world).obstacles;
-				Iterator<Rectangle2D> it = list.iterator();
+				Iterator<Rectangle2D> it = world.obstacles().iterator();
 				while( it.hasNext() ){
 					Rectangle2D o = it.next();
 					if( o.contains(point) ){
@@ -194,7 +202,7 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 						(int) Math.abs( old.getX() - point.getX() ), //w
 						(int) Math.abs( old.getY() - point.getY() )  //h
 						);
-				((RRTWorld)world).obstacles.add(rect);
+				world.obstacles().add(rect);
 				m = Mode.NEW_OBSTACLE_PT1;
 				break;
 			default:

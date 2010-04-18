@@ -1,5 +1,9 @@
+package rrtImpl;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
+
+import rrt.Node;
+import rrt.Tree;
 
 import com.savarese.spatial.GenericPoint;
 import com.savarese.spatial.KDTree;

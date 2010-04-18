@@ -1,3 +1,5 @@
+package gui;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -10,6 +12,10 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import rrt.Node;
+import rrt.Tree;
+import rrt.World;
 
 /*
  *  - left mouse button + right mouse button = line

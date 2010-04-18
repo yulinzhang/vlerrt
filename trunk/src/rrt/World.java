@@ -1,5 +1,7 @@
+package rrt;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 public interface World {
 
@@ -14,7 +16,7 @@ public interface World {
 	public void setStart(Point2D start);
 	public void setGoal(Point2D goal);
 	
-	public Iterable<Rectangle2D> obstacles();
+	public List<Rectangle2D> obstacles();
 
 	public int height();
 	public int width();

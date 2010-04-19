@@ -12,6 +12,8 @@ public interface World {
 	public Point2D start();
 	public Point2D goal();
 	
+	public String getName();
+	
 	
 	public void setStart(Point2D start);
 	public void setGoal(Point2D goal);

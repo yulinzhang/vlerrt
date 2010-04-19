@@ -32,13 +32,21 @@ public class RRTWorld implements World {
 	
 	protected int w, h;
 	protected Point2D start, goal;
+	protected String name;
 	
+	public String getName() {
+		return name;
+	}
+
+
+
 	public RRTWorld(RRTWorld world) {
 		r = world.r;
 		start = world.start;
 		goal = world.goal;
 		w = world.w;
 		h = world.h;
+		this.name = world.name;
 		
 		obstacles = new LinkedList<Rectangle2D>();
 		Iterator<Rectangle2D> itr = world.obstacles.iterator();
@@ -54,6 +62,7 @@ public class RRTWorld implements World {
 		
 		w = sc.nextInt();
 		h = sc.nextInt();
+		this.name = file;
 		
 		start = new Point2D.Double(sc.nextInt(), sc.nextInt());
 		goal = new Point2D.Double(sc.nextInt(), sc.nextInt());

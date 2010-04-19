@@ -22,7 +22,7 @@ import testing.Stats;
 
 public class RRTResearch extends RRTsearch {
 
-	public static final double thresholdFactor = 0.05;
+	public static double thresholdFactor = 0.10;
 	
 	private Tree prevSearch;
 	public Tree getPrevSearch() {

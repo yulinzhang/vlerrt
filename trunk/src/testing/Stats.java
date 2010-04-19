@@ -19,6 +19,10 @@ public class Stats {
 	private int pWayPoint;
 	private long initTime;
 	private long goalFTime;
+	
+	
+	private boolean atGoal = false;
+	
 
 
 
@@ -222,6 +226,14 @@ public class Stats {
 
 	public Node getGoal() {
 		return goal;
+	}
+
+	public void setAtGoal(boolean atGoal) {
+		this.atGoal = atGoal;
+	}
+
+	public boolean isAtGoal() {
+		return atGoal;
 	}	
 	
 	

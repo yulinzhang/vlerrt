@@ -11,7 +11,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JDialog;
@@ -23,7 +22,6 @@ import rrt.Tree;
 import rrt.World;
 import rrtImpl.RRTWorld;
 import search.RRTsearch;
-import search.RRTsearch.Algorithm;
 import testing.Testing;
 
 

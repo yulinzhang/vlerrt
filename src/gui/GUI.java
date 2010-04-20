@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -16,6 +18,9 @@ import javax.swing.JPanel;
 import rrt.Node;
 import rrt.Tree;
 import rrt.World;
+import rrtImpl.RRTWorld;
+import rrtImpl.VLRRTnode;
+import search.RRTsearch;
 
 /*
  *  - left mouse button + right mouse button = line
@@ -23,7 +28,26 @@ import rrt.World;
  */
 
 @SuppressWarnings("serial")
-public class GUI extends JPanel {
+public class GUI extends JPanel implements KeyListener{
+	
+	protected static final int STEPS = 1;
+	
+	public static void main(String[] args) throws Exception {
+
+		RRTsearch search = RRTsearch.DVLRRT(
+				new RRTWorld("worlds/proposal-world"),20,10,
+				VLRRTnode.changeEpsilonScheme.Mult, 2, 
+				VLRRTnode.changeEpsilonScheme.Restart,1);
+		
+		final JFrame frame = new JFrame("press D for step");
+		final GUI gui = new GUI(search,true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(gui);
+		frame.pack();
+		frame.setResizable(false);
+		frame.setVisible(true);	
+		gui.grabFocus();
+	}
 
 	public static void display(World world, Tree tree, String title) {
 		display(world, tree, title, false);
@@ -65,6 +89,7 @@ public class GUI extends JPanel {
 
 	protected final World world;
 	protected final Tree tree;
+	protected final RRTsearch search;
 	protected final boolean drawHalos;
 
 	static final protected Color BACKGROUND = Color.WHITE;
@@ -85,7 +110,20 @@ public class GUI extends JPanel {
 		this.world = w;
 		this.tree = t;
 		this.drawHalos = halo;
-
+		this.search = null;
+		init();
+	}
+	
+	public GUI(RRTsearch s, boolean halo){
+		super();
+		this.world = s.getWorld();
+		this.tree = s.getSearchTree();
+		this.drawHalos = halo;
+		this.search = s;
+		init();
+	}
+	
+	protected void init(){
 		//component contains the world
 		JPanel p = new JPanel(){
 			public void paint(Graphics g) {
@@ -97,6 +135,7 @@ public class GUI extends JPanel {
 		p.setPreferredSize(d);
 		p.setBackground(BACKGROUND);
 		add(p);
+		addKeyListener(this);
 	}
 
 	public void draw(Graphics2D g, World world, Tree tree){
@@ -176,5 +215,15 @@ public class GUI extends JPanel {
 					y - deltaY-2, 2, 2));  //y directions reversed, adjust to make upper left corner
 		}
 	}
+
+	public void keyTyped(KeyEvent e) { }
+	public void keyPressed(KeyEvent e) { }
+	public void keyReleased(KeyEvent e) { 
+		if( e.getKeyCode() == KeyEvent.VK_D && search != null ){
+			search.runSearch(STEPS);
+			repaint();
+		}
+	}
+
 	
 }

@@ -5,13 +5,10 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-
 import rrt.Node;
 import rrt.World;
 import rrtImpl.RRTWorld;
 import rrtImpl.VLRRTnode;
-import rrtImpl.VLRRTnode.changeEpsilonScheme;
-import search.RRTsearch.Algorithm;
 
 public class RRTsearchPausing extends RRTsearch {
 

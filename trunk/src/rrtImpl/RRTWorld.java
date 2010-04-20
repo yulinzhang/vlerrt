@@ -1,6 +1,4 @@
 package rrtImpl;
-import gui.GUI;
-
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -20,12 +18,6 @@ import rrt.World;
  */
 
 public class RRTWorld implements World {
-	
-	public static void main(String[] args) throws Exception{
-		RRTWorld w = new RRTWorld("asd");
-//		w.write("asd");
-		GUI.display(w, null, "ok");
-	}
 	
 	protected Random r;
 	protected List<Rectangle2D> obstacles;

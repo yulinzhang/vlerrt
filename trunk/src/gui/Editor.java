@@ -18,12 +18,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 
-import rrt.Tree;
-import rrt.World;
 import rrtImpl.RRTWorld;
 import search.RRTsearch;
 import testing.Testing;
-
 
 
 @SuppressWarnings("serial")
@@ -50,7 +47,7 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 	String file;
 
 	public Editor(String f) throws Exception {
-		super(new RRTWorld(f),null);
+		super(new RRTWorld(f));
 		file = f;
 		
 		addMouseListener(this);
@@ -116,15 +113,15 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 					search.printStats("editorOut",false);//FIXME: halting bug.
 					
 					JDialog dialog = new JDialog();
-					dialog.add(new GUI(world,search.getSearcher().getSearchTree()));
+					dialog.add(new GUI(search.getSearcher(),false));
 					dialog.pack();
 					dialog.setVisible(true);
 			}
 		});
 	}
 
-	public void draw(Graphics2D g, World world, Tree tree){
-		super.draw(g, world, tree);
+	public void draw(Graphics2D g){
+		super.draw(g);
 		
 		if( m == Mode.NEW_OBSTACLE_PT2 ){
 			g.drawRect(						
@@ -159,8 +156,6 @@ public class Editor extends GUI implements MouseListener, MouseMotionListener {
 	}
 
 	protected Point2D wtfMouse(MouseEvent e){
-//		System.out.println( this.getBounds() +" "+ e.getPoint());
-
 		return new Point2D.Double(e.getX()-WTF_W, e.getY()-WTF_H);	
 	}
 

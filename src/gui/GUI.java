@@ -11,6 +11,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -33,12 +34,10 @@ public class GUI extends JPanel implements KeyListener{
 	protected static final int STEPS = 1;
 	
 	public static void main(String[] args) throws Exception {
-
 		RRTsearch search = RRTsearch.DVLRRT(
 				new RRTWorld("worlds/proposal-world"),20,10,
 				VLRRTnode.changeEpsilonScheme.Mult, 2, 
 				VLRRTnode.changeEpsilonScheme.Restart,1);
-		
 		final JFrame frame = new JFrame("press D for step");
 		final GUI gui = new GUI(search,true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,14 +48,14 @@ public class GUI extends JPanel implements KeyListener{
 		gui.grabFocus();
 	}
 
-	public static void display(World world, Tree tree, String title) {
-		display(world, tree, title, false);
+	public static void display(RRTsearch s, String title) {
+		display(s, title, false);
 	}
 	
-	public static void display(World world, Tree tree, String title, boolean halos){
+	public static void display(RRTsearch s, String title, boolean halos){
 		JFrame frame = new JFrame(title);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new GUI(world,tree,halos));
+		frame.add(new GUI(s,halos));
 		frame.pack();
 		frame.setVisible(true);		
 	}
@@ -68,14 +67,14 @@ public class GUI extends JPanel implements KeyListener{
 	    return bi;
 	}
 	
-	public static void screenshot(World world, Tree tree, String filename){
-		screenshot(world, tree, filename, false);
+	public static void screenshot(RRTsearch s, String filename){
+		screenshot(s, filename, false);
 	}
 
-	public static void screenshot(World world, Tree tree, String filename, boolean halos){
+	public static void screenshot(RRTsearch s, String filename, boolean halos){
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		GUI gui = new GUI(world,tree, halos);
+		GUI gui = new GUI(s, halos);
 		frame.add(gui);
 		frame.pack();
 		try {
@@ -100,35 +99,32 @@ public class GUI extends JPanel implements KeyListener{
 	static final protected Color PATH = Color.BLUE;
 	static final protected Color ALL_PATH = Color.PINK;
 	static final protected Color HALO = Color.MAGENTA;
-
-	public GUI(World w, Tree t){
-		this(w, t, false);
-	}
-		
-	public GUI(World w, Tree t, boolean halo){
+	static final protected Color WAYPOINT = Color.YELLOW;
+	
+	public GUI(World w){
 		super();
-		this.world = w;
-		this.tree = t;
-		this.drawHalos = halo;
+		this.drawHalos = false;
 		this.search = null;
+		this.world = w;
+		this.tree = null;
 		init();
 	}
 	
 	public GUI(RRTsearch s, boolean halo){
 		super();
-		this.world = s.getWorld();
-		this.tree = s.getSearchTree();
 		this.drawHalos = halo;
 		this.search = s;
+		this.world = s.getWorld();
+		this.tree = s.getSearchTree();
 		init();
 	}
 	
-	protected void init(){
+	public void init(){
 		//component contains the world
 		JPanel p = new JPanel(){
 			public void paint(Graphics g) {
 				super.paint(g);
-				draw((Graphics2D) g, world, tree, drawHalos);
+				draw((Graphics2D) g);
 			}
 		};
 		Dimension d = new Dimension(world.width(),world.height());
@@ -137,12 +133,8 @@ public class GUI extends JPanel implements KeyListener{
 		add(p);
 		addKeyListener(this);
 	}
-
-	public void draw(Graphics2D g, World world, Tree tree){
-		draw(g, world, tree, false);
-	}
 	
-	public void draw(Graphics2D g, World world, Tree tree, boolean halo){
+	public void draw(Graphics2D g){
 		// this does not improve the drawing at all...		
 		//		g.setRenderingHint( java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON );
 
@@ -189,6 +181,18 @@ public class GUI extends JPanel implements KeyListener{
 				Point2D parent = parent_node.getPoint();
 				g.draw(new Line2D.Double(leaf,parent));
 				goal = parent_node;
+			}
+		}
+		
+		//waypoints
+		if( search != null ){
+			g.setColor(WAYPOINT);
+			List<Node> wp = search.getWaypoints();
+			if( wp!=null ){
+				for( Node n : wp ){
+					g.drawOval( ((int)n.getPoint().getX()), 
+							((int)n.getPoint().getY()-1), 2, 2);
+				}
 			}
 		}
 

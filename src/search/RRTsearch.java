@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-
 import rrt.Node;
 import rrt.Tree;
 import rrt.World;
@@ -15,7 +14,6 @@ import rrtImpl.RRTWorld;
 import rrtImpl.RRTnode;
 import rrtImpl.RRTtree;
 import rrtImpl.VLRRTnode;
-import rrtImpl.VLRRTnode.changeEpsilonScheme;
 import testing.Stats;
 
 public class RRTsearch {
@@ -234,23 +232,27 @@ public class RRTsearch {
 		return w;
 	}
 	
+	public List<Node> getWaypoints(){
+		return wayPoints;
+	}
+	
 	public void show(){
-		GUI.display(w, searchTree, "RRTWorld");
+		GUI.display(this, "RRTWorld");
 //		GUI.screenshot(w, searchTree, "asd");	
 	}
 	
 	public void show(String title){
-		GUI.display(w, searchTree, title);
+		GUI.display(this, title);
 //		GUI.screenshot(w, searchTree, "asd");	
 	}
 	
 	public void show(String title, boolean halos){
-		GUI.display(w, searchTree, title, halos);
+		GUI.display(this, title, halos);
 //		GUI.screenshot(w, searchTree, "asd");	
 	}
 	
 	public void screenshot(String filename) {
-		GUI.screenshot(w,searchTree,filename);
+		GUI.screenshot(this,filename);
 	}
 	
 	public void runSearch(int iterations) {

@@ -1,51 +1,37 @@
 package gui;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractButton;
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 
 import search.RRTsearchPausing;
 
 @SuppressWarnings("serial")
-public class PausingGUI extends GUI implements ActionListener {
+public class PausingGUI extends GUI {
 
 	protected JButton doneButton, stepButton;
-	protected RRTsearchPausing search;
+	protected final RRTsearchPausing search;
 
-
-
-	public PausingGUI(RRTsearchPausing search){	
-		super(search.getWorld(), search.getSearchTree(), true);
-		this.search = search; 
-		doneButton = new JButton("Exit");
-		doneButton.setVerticalTextPosition(AbstractButton.CENTER);
-		doneButton.setHorizontalTextPosition(AbstractButton.LEADING); //aka LEFT, for left-to-right locales
-		doneButton.setMnemonic(KeyEvent.VK_D);
-		doneButton.setActionCommand("end");
-		doneButton.addActionListener(this);
+	public PausingGUI(RRTsearchPausing s){	
+		super(s.getWorld(), s.getSearchTree(), true);
+		this.search = s;
+		doneButton = new JButton(new AbstractAction("Exit") {
+			public void actionPerformed(ActionEvent e) {
+				search.setDone(true);
+			}
+		});
+		doneButton.setMnemonic(KeyEvent.VK_ESCAPE); // + ALT
 		
-		stepButton = new JButton("Step");
-		stepButton.setVerticalTextPosition(AbstractButton.CENTER);
-		stepButton.setHorizontalTextPosition(AbstractButton.LEADING); //aka LEFT, for left-to-right locales
-		stepButton.setMnemonic(KeyEvent.VK_D);
-		stepButton.setActionCommand("step");
-		stepButton.addActionListener(this);
+		stepButton = new JButton(new AbstractAction("Step") {
+			public void actionPerformed(ActionEvent e) {
+				search.setNextStep(true);
+			}
+		});
+		stepButton.setMnemonic(KeyEvent.VK_D); // + ALT
 
 		add(doneButton);
 		add(stepButton);
-		setVisible(true);
-		
-	}
-
-
-	public void actionPerformed(ActionEvent e) {
-		if ("end".equals(e.getActionCommand())) {
-			search.setDone(true);
-		} else {
-			search.setNextStep(true);
-		}	
 	}
 }

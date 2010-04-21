@@ -28,7 +28,7 @@ public class Stats {
 
 
 	RRTsearch.Algorithm alg;
-	long runtime;
+	double runtime;
 
 	@Override
 	public String toString() {
@@ -71,8 +71,13 @@ public class Stats {
 		return goalFTime;
 	}
 	
-	public long getElapsedTime() {
-		return goalFTime-initTime;
+	public double getElapsedTime() {
+		double res = goalFTime-initTime;
+		if (res < 0)
+			return runtime;
+		else 
+			return res;
+
 	}
 
 
@@ -135,7 +140,7 @@ public class Stats {
 
 
 
-	public void setRuntime(long runtime) {
+	public void setRuntime(double runtime) {
 		this.runtime = runtime;
 	}
 
@@ -216,7 +221,7 @@ public class Stats {
 	}
 
 
-	public long getRuntime() {
+	public double getRuntime() {
 		return runtime;
 	}
 

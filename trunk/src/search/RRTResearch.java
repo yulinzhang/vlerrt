@@ -193,7 +193,6 @@ public class RRTResearch extends RRTsearch {
 	}
 	
 
-
 	private Node[] potentialNeighbours(Point2D point, int nClosest) {
 		return prevSearch.nClosestTo(point, nClosest);
 	}

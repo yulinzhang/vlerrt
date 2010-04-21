@@ -29,7 +29,7 @@ public class Testing {
 
 	/* Class for testing and evaluating the RRT algorithms */
 
-	private final double PROB_CHANGE_OBSTACLE = 0.10;
+	static public final double PROB_CHANGE_OBSTACLE = 0.10;
 
 	private RRTsearch searcher;
 
@@ -50,8 +50,6 @@ public class Testing {
 
 	/* TODO: recording start time and goal find time  */
 	/* TODO: pretty print of information for graphing  */
-
-
 
 
 	class TestTask extends Thread {
@@ -199,8 +197,7 @@ public class Testing {
 			//System.out.println("Goal Distance: "+stat.getgDistance());
 			if (stat.getElapsedTime() > 0)
 				System.out.println("Alg:" +stat.getAlg() + " Runtime: "+stat.getElapsedTime());
-			//searcher.show();
-			searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
+			searcher.show();
 		}
 		stat.setnNodes(searcher.getSearchTree().nNodes());
 		stats.add(stat); //Store for future processing.
@@ -208,7 +205,7 @@ public class Testing {
 		//searcher.show();
 
 
-		//
+//		searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
 
 
 	}
@@ -278,10 +275,6 @@ public class Testing {
 
 
 
-	private double getRandomShift(Random rng, int bound) {
-		return rng.nextBoolean()? rng.nextInt((int)(bound*0.05)) : -(rng.nextInt((int)(bound*0.05)));
-	}
-
 
 
 
@@ -295,11 +288,7 @@ public class Testing {
 
 	}
 
-	
-	
-	
-	
-	private void advanceStart(double d) {
+	private void advanceStart(double d, boolean choose_begin) { //if choose_begin round down, else round up.
 		LinkedList<Node> l = searcher.collectBestPlan();
 		if (l.getFirst().getPoint().distance(world.goal()) == 0.0)
 			stats.getLast().setAtGoal(true);
@@ -318,17 +307,22 @@ public class Testing {
 			double inc = begin.distance(end);
 			aux += inc;
 			if (aux >= d) {
-				aux -= inc;
 				break; //done
 			}
 
 			begin = end;
 		}	
-		double distance = d-aux;
-		double angle = DVLRRTnode.computeAngle(begin, end);
-		
-		Point2D newBegin = new Point2D.Double(begin.getX()+(distance*Math.cos(angle)),begin.getY()-(distance*Math.sin(angle)));
-		world.setStart(newBegin);
+
+		if (choose_begin)
+			world.setStart(begin);
+		else {
+			if (end != null)
+				world.setStart(end);
+			else
+				world.setStart(begin);
+		}
+
+
 
 	}
 
@@ -342,44 +336,15 @@ public class Testing {
 		return res;
 	}
 
-
-	private void changeWorld() { 
-		World newWorld = new RRTWorld((RRTWorld)world);
+	//TODO: densities
+	public List<Node> genWaypointsDensity(int nWaypoints) {
+		LinkedList<Node> l = searcher.collectBestPlan();
 		Random rng = new Random(System.nanoTime());
-		Iterator<Rectangle2D> obsItr = newWorld.obstacles().iterator();
-		int width = newWorld.width();
-		int height = newWorld.height();
-
-		while (obsItr.hasNext()) {
-			Rectangle2D obstacle = obsItr.next();
-			if (rng.nextDouble() < PROB_CHANGE_OBSTACLE) {
-				do {
-					double shiftX = getRandomShift(rng,width);
-					double shiftY = getRandomShift(rng,height);
-
-					if (shiftX < 0) {
-						if (obstacle.getX()+shiftX < 0)
-							shiftX += obstacle.getX()+shiftX;
-					} else
-						if (shiftX >= 0)
-							if (obstacle.getX()+obstacle.getWidth()+shiftX > width)
-								shiftX -= (obstacle.getX()+obstacle.getWidth()+shiftX - width);
-					if (shiftY < 0) {
-						if (obstacle.getY()+shiftY < 0)
-							shiftY += obstacle.getY()+shiftY;
-					} else
-						if (shiftY >= 0)
-							if (obstacle.getY()+obstacle.getHeight()+shiftY > height)
-								shiftY -= (obstacle.getY()+obstacle.getHeight()+shiftY - height);
-
-
-
-					obstacle.setRect(obstacle.getX()+shiftX, obstacle.getY()+shiftY, obstacle.getWidth(), obstacle.getHeight());
-				} while (obstacle.contains(world.goal()) || obstacle.contains(world.start()));
-
-			}
+		List<Node> res = new LinkedList<Node>();
+		for (int i=0;i<nWaypoints;i++) {
+			res.add(l.get(rng.nextInt(l.size())));
 		}
-		this.world = newWorld;		
+		return res;
 	}
 
 
@@ -441,11 +406,10 @@ public class Testing {
 	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen, RRTResearch.averageStrat strat, int nWaypoints, int nClosest, boolean changeWorld, boolean round) {
 		for (int i=0;i<n;i++) {
 			execSearch(alg,printToScreen, true, strat, nClosest);
-			advanceStart(25.0);
+			advanceStart(25.0, round);
 			wayPoints = genWaypoints(nWaypoints);
-			if (changeWorld)
-				changeWorld();
-
+			if (changeWorld && i<(n-1))
+				world = world.changeWorld();
 		}
 	}
 
@@ -465,11 +429,11 @@ public class Testing {
 
 
 //		test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
-		test.execNReRuns(100,RRTsearch.Algorithm.DVLERRT,true, null,10, 10, true, false);
+		test.execNReRuns(5,RRTsearch.Algorithm.DVLERRT,true, null,10, 10, true, false);
 		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-		test.execNReRuns(100,RRTsearch.Algorithm.VLERRT,true, RRTResearch.averageStrat.Simple,10, 10, true,false);
-		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-	    test.execNReRuns(100, RRTsearch.Algorithm.ERRT, true, null, 10, 10, true,false);
+//		test.execNReRuns(100,RRTsearch.Algorithm.VLERRT,true, RRTResearch.averageStrat.Simple,10, 10, true,false);
+//		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
+//	    test.execNReRuns(100, RRTsearch.Algorithm.ERRT, true, null, 10, 10, true,false);
 
 	    //test.execNRuns(50,RRTsearch.Algorithm.DVLRRT,true);
 		//test.printStats("stats_bb_50_20_10_", true);
@@ -497,7 +461,10 @@ public class Testing {
 		test.execNRuns(50,RRTsearch.Algorithm.VLRRT);
 		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT);
 		test.printStats("stats_tp_40_15_20_", true);*/
-
+//		for (int i=0;i<50;i++) {
+//			megaTest(0.10);
+//			megaTest(0.05);
+//		}
 	}
 
 	public void printer(FileWriter fwr, boolean change, boolean round) throws IOException {
@@ -508,12 +475,6 @@ public class Testing {
 		}
 	}
 
-	
-	public void batch(int nRuns) {
-		
-	}
-	
-	
 	public static void megaTest(double percent) {
 		String s = "megaTests_replanning" + percent + "_"+(System.currentTimeMillis()%1000);
 		RRTResearch.thresholdFactor = percent;

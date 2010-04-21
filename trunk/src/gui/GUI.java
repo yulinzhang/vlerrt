@@ -99,7 +99,7 @@ public class GUI extends JPanel implements KeyListener{
 	static final protected Color PATH = Color.BLUE;
 	static final protected Color ALL_PATH = Color.PINK;
 	static final protected Color HALO = Color.MAGENTA;
-	static final protected Color WAYPOINT = Color.YELLOW;
+	static final protected Color WAYPOINT = Color.DARK_GRAY;
 	
 	public GUI(World w){
 		super();

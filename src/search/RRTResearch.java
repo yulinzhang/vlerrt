@@ -229,7 +229,6 @@ public class RRTResearch extends RRTsearch {
 	//SimpleAvg of all epsilons of neighbors
 	private double calculateAvgEpsilon(Point2D point, Node[] potentialNeighbs) {
 		
-		
 		if (potentialNeighbs.length == 0)
 			return 0.0;
 		
@@ -263,7 +262,9 @@ public class RRTResearch extends RRTsearch {
 		for (int i=0; i<potentialNeighbs.length;i++) {
 			Node current = potentialNeighbs[i];
 			if (current instanceof VLRRTnode) {
-				res += (((VLRRTnode)current).epsilon * (distance += point.distance(current.getPoint())));
+				double d = point.distance(current.getPoint());
+				res += ((VLRRTnode)current).epsilon * (d );
+				distance +=point.distance(current.getPoint());
 			}
 		}
 		if ((distance/potentialNeighbs.length) > dThreshold) {

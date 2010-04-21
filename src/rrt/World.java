@@ -23,6 +23,8 @@ public interface World {
 	public int height();
 	public int width();
 	
-	void write(String file) throws Exception;
+	public void write(String file) throws Exception;
+	
+	public World changeWorld();
 	
 }

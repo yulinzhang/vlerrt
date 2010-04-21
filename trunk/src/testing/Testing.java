@@ -205,7 +205,7 @@ public class Testing {
 		//searcher.show();
 
 
-//		searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
+		//		searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
 
 
 	}
@@ -339,10 +339,35 @@ public class Testing {
 	//TODO: densities
 	public List<Node> genWaypointsDensity(int nWaypoints) {
 		LinkedList<Node> l = searcher.collectBestPlan();
-		Random rng = new Random(System.nanoTime());
 		List<Node> res = new LinkedList<Node>();
-		for (int i=0;i<nWaypoints;i++) {
-			res.add(l.get(rng.nextInt(l.size())));
+		if( searcher instanceof RRTResearch && l.size() > 0 ){
+			RRTResearch r = (RRTResearch) searcher;
+			Node[] array = l.toArray(new Node[l.size()]);
+			int[] densities = new int[array.length];
+			int max = 0;
+			for(int i=0;i<array.length;++i){
+				densities[i] = r.calculateDensity(array[i]);
+				max += densities[i];
+			}
+
+			//invert count to get min density as more probable
+			int n_max = 0;
+			for(int i=0;i<array.length;++i){
+				densities[i] = max - densities[i];
+				n_max += densities[i]; 
+			}
+
+			Random rng = new Random(System.nanoTime());
+			for (int i=0;i<nWaypoints;i++) {
+				int n = rng.nextInt(n_max);
+				for(int j=0;i<array.length;++j){
+					n -= densities[i];
+					if( n<=0 ){
+						res.add( array[j] );
+						break;
+					}
+				}
+			}
 		}
 		return res;
 	}
@@ -408,6 +433,7 @@ public class Testing {
 			execSearch(alg,printToScreen, true, strat, nClosest);
 			advanceStart(25.0, round);
 			wayPoints = genWaypoints(nWaypoints);
+//			wayPoints = genWaypointsDensity(nWaypoints);
 			if (changeWorld && i<(n-1))
 				world = world.changeWorld();
 		}
@@ -428,14 +454,14 @@ public class Testing {
 		Testing test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world")); //
 
 
-//		test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
+		//		test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
 		test.execNReRuns(5,RRTsearch.Algorithm.DVLERRT,true, null,10, 10, true, false);
 		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-//		test.execNReRuns(100,RRTsearch.Algorithm.VLERRT,true, RRTResearch.averageStrat.Simple,10, 10, true,false);
-//		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-//	    test.execNReRuns(100, RRTsearch.Algorithm.ERRT, true, null, 10, 10, true,false);
+		//		test.execNReRuns(100,RRTsearch.Algorithm.VLERRT,true, RRTResearch.averageStrat.Simple,10, 10, true,false);
+		//		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
+		//	    test.execNReRuns(100, RRTsearch.Algorithm.ERRT, true, null, 10, 10, true,false);
 
-	    //test.execNRuns(50,RRTsearch.Algorithm.DVLRRT,true);
+		//test.execNRuns(50,RRTsearch.Algorithm.DVLRRT,true);
 		//test.printStats("stats_bb_50_20_10_", true);
 
 		/*test = new Testing(50,40, 15, 0, null, 1, new RRTWorld("worlds/big_barrier_redux")); //
@@ -461,10 +487,10 @@ public class Testing {
 		test.execNRuns(50,RRTsearch.Algorithm.VLRRT);
 		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT);
 		test.printStats("stats_tp_40_15_20_", true);*/
-//		for (int i=0;i<50;i++) {
-//			megaTest(0.10);
-//			megaTest(0.05);
-//		}
+		//		for (int i=0;i<50;i++) {
+		//			megaTest(0.10);
+		//			megaTest(0.05);
+		//		}
 	}
 
 	public void printer(FileWriter fwr, boolean change, boolean round) throws IOException {

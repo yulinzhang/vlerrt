@@ -202,20 +202,24 @@ public class RRTResearch extends RRTsearch {
 		if (potentialNeighbs.length == 0)
 			return null;
 		
+		int count = 0;
 		DirectionalEpsilonMap res = new DirectionalEpsilonMap();
 		double distance = 0.0;
 		
 		for (int i=0;i<potentialNeighbs.length;i++) {
 			Node current = potentialNeighbs[i];
 			if (current instanceof DVLRRTnode) {
-				distance += point.distance(current.getPoint());
-				double dirNP = DVLRRTnode.computeAngle(current.getPoint(), point);
-				double epsCurrent = current.getExtensionLength(dirNP);
-				res.setEpsilon(DVLRRTnode.computeAngle(point, current.getPoint()), epsCurrent);
+				
+				if (point.distance(current.getPoint()) < dThreshold) {
+					count++;
+					double dirNP = DVLRRTnode.computeAngle(current.getPoint(), point);
+					double epsCurrent = current.getExtensionLength(dirNP);
+					res.setEpsilon(DVLRRTnode.computeAngle(point, current.getPoint()), epsCurrent);
+				}
 			}
 		}
 		
-		if ((distance/potentialNeighbs.length) > dThreshold) {
+		if (count == 0) {
 			return null;
 		}
 		else {
@@ -227,7 +231,7 @@ public class RRTResearch extends RRTsearch {
 	
 	//SimpleAvg of all epsilons of neighbors
 	private double calculateAvgEpsilon(Point2D point, Node[] potentialNeighbs) {
-		
+		int count = 0;
 		if (potentialNeighbs.length == 0)
 			return 0.0;
 		
@@ -237,40 +241,53 @@ public class RRTResearch extends RRTsearch {
 		for (int i=0; i<potentialNeighbs.length;i++) {
 			Node current = potentialNeighbs[i];
 			if (current instanceof VLRRTnode) {
-				res += ((VLRRTnode)current).epsilon;
-				distance += point.distance(current.getPoint());
+				distance = point.distance(current.getPoint());
+				if (distance < dThreshold) {
+					res += ((VLRRTnode)current).epsilon;
+					count++;
+				}	
 			}
 		}
 		
-		if ((distance/potentialNeighbs.length) > dThreshold) {
+		if (count == 0) {
 			return 0;
 		}
 		else
-			return (res/potentialNeighbs.length);
+			return (res/((double)count));
 	}
+	
+	
+	
+	
 	
 	//Weighted Avg.
 	private double calculateWAvgEpsilon(Point2D point, Node[] potentialNeighbs) {
 		
+		int count = 0;
 		if (potentialNeighbs.length == 0)
 			return 0.0;
 		
 		double res = 0.0;
+		double d = 0.0;
 		double distance = 0.0;
 		
 		for (int i=0; i<potentialNeighbs.length;i++) {
 			Node current = potentialNeighbs[i];
 			if (current instanceof VLRRTnode) {
-				double d = point.distance(current.getPoint());
-				res += ((VLRRTnode)current).epsilon * (d );
-				distance +=point.distance(current.getPoint());
+				d = point.distance(current.getPoint());
+				if (d < dThreshold) {
+					res += ((VLRRTnode)current).epsilon * d;
+					count++;
+					distance += d;
+				}	
 			}
 		}
-		if ((distance/potentialNeighbs.length) > dThreshold) {
+		
+		if (count == 0) {
 			return 0;
 		}
 		else
-			return (res/(potentialNeighbs.length * distance));
+			return (res/((double)count*distance));
 	}
 	
 	private Node step(Stats stats) {

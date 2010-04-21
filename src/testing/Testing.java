@@ -73,10 +73,10 @@ public class Testing {
 			};
 			javax.swing.Timer timer = new Timer(delay,stopper);
 			timer.setRepeats(false); //stop once...
-			long t0 = System.currentTimeMillis();
+			double t0 = System.nanoTime();
 			timer.start();
 			int nItrs = search.runSearchHalt(stats);
-			long rtime = System.currentTimeMillis() - t0;
+			double rtime = System.nanoTime() - t0;
 			stats.setRuntime(rtime);
 			stats.setnIterations(nItrs);
 			//System.out.println("Search has halted in "+rtime);
@@ -87,25 +87,25 @@ public class Testing {
 
 	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world, boolean optimize)  {
 		this(runtime, p, baseLength, pWayPoint, wayPoints, world, optimize, 
-				VLRRTnode.changeEpsilonScheme.Linear, .1, VLRRTnode.changeEpsilonScheme.Linear, .1);
+				VLRRTnode.changeEpsilonScheme.Mult, 2.0, VLRRTnode.changeEpsilonScheme.Restart, .1);
 
 
 	}
 
 	public Testing(int runtime, int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world)  {
 		this(runtime, p, baseLength, pWayPoint, wayPoints, world, false, 
-				VLRRTnode.changeEpsilonScheme.Linear, .1, VLRRTnode.changeEpsilonScheme.Linear, .1);
+				VLRRTnode.changeEpsilonScheme.Mult, 2.0, VLRRTnode.changeEpsilonScheme.Restart, .1);
 
 	}
 
 	public Testing( int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world)  {
 		this(50, p, baseLength, pWayPoint, wayPoints, world, false, 
-				VLRRTnode.changeEpsilonScheme.Linear, .1, VLRRTnode.changeEpsilonScheme.Linear, .1);
+				VLRRTnode.changeEpsilonScheme.Mult, 2.0, VLRRTnode.changeEpsilonScheme.Restart, .1);
 	}
 
 	public Testing( int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world, boolean optimize)  {
 		this(50, p, baseLength, pWayPoint, wayPoints, world, optimize, 
-				VLRRTnode.changeEpsilonScheme.Linear, .1, VLRRTnode.changeEpsilonScheme.Linear, .1);
+				VLRRTnode.changeEpsilonScheme.Mult, 2.0, VLRRTnode.changeEpsilonScheme.Restart, .1);
 	}
 
 	public Testing(int p, int baseLength, int pWayPoint, List<Node> wayPoints, World world,
@@ -287,10 +287,10 @@ public class Testing {
 
 
 	}
-
-	private void advanceStart(double d, boolean choose_begin) { //if choose_begin round down, else round up.
+	
+	private void advanceStart(double d) {
 		LinkedList<Node> l = searcher.collectBestPlan();
-		if (l.getFirst().getPoint().distance(world.goal()) == 0.0)
+		if (l.size() == 1)
 			stats.getLast().setAtGoal(true);
 
 		double aux = 0.0;
@@ -307,24 +307,25 @@ public class Testing {
 			double inc = begin.distance(end);
 			aux += inc;
 			if (aux >= d) {
+				aux -= inc;
 				break; //done
 			}
 
 			begin = end;
-		}	
-
-		if (choose_begin)
-			world.setStart(begin);
-		else {
-			if (end != null)
-				world.setStart(end);
-			else
-				world.setStart(begin);
 		}
-
-
+		if (end == null) {
+			world.setStart(begin);
+			return;
+		}
+		
+		double distance = d-aux;
+		double angle = DVLRRTnode.computeAngle(begin, end);
+		
+		Point2D newBegin = new Point2D.Double(begin.getX()+(distance*Math.cos(angle)),begin.getY()-(distance*Math.sin(angle)));
+		world.setStart(newBegin);
 
 	}
+	
 
 	public List<Node> genWaypoints(int nWaypoints) {
 		LinkedList<Node> l = searcher.collectBestPlan();
@@ -428,10 +429,10 @@ public class Testing {
 
 
 
-	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen, RRTResearch.averageStrat strat, int nWaypoints, int nClosest, boolean changeWorld, boolean round) {
+	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen, boolean replan , RRTResearch.averageStrat strat, int nWaypoints, int nClosest, boolean changeWorld) {
 		for (int i=0;i<n;i++) {
 			execSearch(alg,printToScreen, true, strat, nClosest);
-			advanceStart(25.0, round);
+			advanceStart(25.0);
 			wayPoints = genWaypoints(nWaypoints);
 //			wayPoints = genWaypointsDensity(nWaypoints);
 			if (changeWorld && i<(n-1))
@@ -451,11 +452,11 @@ public class Testing {
 
 	public static void main(String[] args) throws Exception{
 
-		Testing test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world")); //
+/*		Testing test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world")); //
 
 
 		//		test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
-		test.execNReRuns(5,RRTsearch.Algorithm.DVLERRT,true, null,10, 10, true, false);
+		test.execNReRuns(5,RRTsearch.Algorithm.DVLERRT,true,true, null,10, 10, true);
 		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
 		//		test.execNReRuns(100,RRTsearch.Algorithm.VLERRT,true, RRTResearch.averageStrat.Simple,10, 10, true,false);
 		//		test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
@@ -491,6 +492,10 @@ public class Testing {
 		//			megaTest(0.10);
 		//			megaTest(0.05);
 		//		}
+		
+		
+		batch(1,300,"RRTpaper-world");
+		
 	}
 
 	public void printer(FileWriter fwr, boolean change, boolean round) throws IOException {
@@ -501,181 +506,303 @@ public class Testing {
 		}
 	}
 
-	public static void megaTest(double percent) {
-		String s = "megaTests_replanning" + percent + "_"+(System.currentTimeMillis()%1000);
-		RRTResearch.thresholdFactor = percent;
+	
+	public static void batch(int nReplans, int nIterations, String world) {
+		String s = "batcher_" + (System.currentTimeMillis()%1000);
 		try {
-			FileWriter fwr = new FileWriter(s+"_ERRT.xls");
-			fwr.write("Algorithm \t World \t Runtime \t atGoal \t ChangeWorld \t Round\n");
-			Testing test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, false,false);
-			test.printer(fwr, false, false);
-
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, false,false);
-			test.printer(fwr, false, false);
-
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000	, RRTsearch.Algorithm.ERRT, false, null, 10, 10, false,false);
-			test.printer(fwr, false, false);
-
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.ERRT, false, null, 10, 10, false,false);
-			test.printer(fwr, false, false);
+			FileWriter fwr = new FileWriter(s + "_" + world);
+			Testing test ;
+			fwr.write("Algorithm \t Iteration \t Avg. Time\n");
+			
+			double[] runtimes = new double[nIterations];
+			double atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.ERRT, false, true, null, 10, 10, true);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_ERRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.ERRT+"_WC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.ERRT, false, true, null, 10, 10, false);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_ERRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.ERRT+"_NWC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Simple, 10, 10, true);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_VLERRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.VLERRT+"_WC_Simple\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Weighted, 10, 10, true);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_VLERRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.VLERRT+"_WC_Weighted\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Simple, 10, 10, false);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_VLERRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.VLERRT+"_NWC_Simple\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Weighted, 10, 10, false);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_VLERRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.VLERRT+"_NWC_Weighted\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.DVLERRT, false, true, RRTResearch.averageStrat.Weighted, 10, 10, true);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_DVLERRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.DVLERRT+"_WC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.DVLERRT, false, true, RRTResearch.averageStrat.Weighted, 10, 10, false);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_DVLERRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.DVLERRT+"_NWC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.VLRRT, false, false, null, 10, 10, true);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_VLRRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.VLRRT+"_WC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.VLRRT, false, false, null, 10, 10, false);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_VLRRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.VLRRT+"_NWC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.DVLRRT, false, false, null, 10, 10, true);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_DVLRRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.DVLRRT+"_WC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
+			runtimes = new double[nIterations];
+			atGoal = 0;
+			for (int j=0;j<nReplans;j++) {
+				boolean aux = false;
+				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
+				test.execNReRuns(nIterations, RRTsearch.Algorithm.DVLRRT, false, false, null, 10, 10, false);
+				Iterator<Stats> itr = test.stats.iterator();
+				int i = 0;
+				while (itr.hasNext()) {
+					Stats stats = itr.next();
+					runtimes[i] += stats.getElapsedTime();
+					if (stats.isAtGoal() && !aux) {
+						atGoal += i;
+						aux = true;
+					}
+					i++;
+				}
+				test.getSearcher().screenshot("Exec_DVLRRT"+"_"+System.currentTimeMillis());
+			}
+			for (int i=0;i<nIterations;i++) {
+				fwr.write(RRTsearch.Algorithm.DVLRRT+"_NWC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
+			}
+			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
+			
 			fwr.close();
-
-
-			fwr = new FileWriter(s+"_VLERRT.xls");
-			fwr.write("Algorithm \t World \t Runtime \t atGoal \t ChangeWorld \t Round\n");
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,false);
-			test.printer(fwr, false, false);
-
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,false);
-			test.printer(fwr, false, false);
-
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,false);
-			test.printer(fwr, false, false);
-
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.VLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,false);
-			test.printer(fwr, false, false);
-			fwr.close();
-
-
-			fwr = new FileWriter(s+"_DVLERRT.xls");
-			fwr.write("Algorithm \t World \t Runtime \t atGoal \t ChangeWorld \t Round\n");
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,false);
-			test.printer(fwr, false, false);
-
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/proposal-world"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,false);
-			test.printer(fwr, false, false);
-
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/clutter"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,false);
-			test.printer(fwr, false, false);
-
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,true);
-			test.printer(fwr, true, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, true,false);
-			test.printer(fwr, true, false);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,true);
-			test.printer(fwr, false, true);
-			test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/cluttered"));
-			test.execNReRuns(5000, RRTsearch.Algorithm.DVLERRT, false, RRTResearch.averageStrat.Simple, 10, 5, false,false);
-			test.printer(fwr, false, false);
-			fwr.close();
-
-
-
-
-
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -683,8 +810,14 @@ public class Testing {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
+		
+		
 	}
+	
+	
+
+	
 
 
 }

@@ -326,7 +326,7 @@ private static void testVariedBaseLengths(String[] worlds) throws Exception {
 		double successes = 0;
 		double failures = 0;
 		double distance = 0;  //only when successful
-		long time = 0;  //only when successful
+		double time = 0;  //only when successful
 		double nodes = 0;  //only when successful
 		double coverage = 0;  //when not successful
 		

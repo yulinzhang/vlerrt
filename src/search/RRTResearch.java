@@ -228,6 +228,23 @@ public class RRTResearch extends RRTsearch {
 		
 	}
 	
+
+	public int calculateDensity(Node node) {
+		Point2D point = node.getPoint();
+		Node[] potentialNeighbs = searchTree.nClosestTo(point, nClosest);
+		int count = 0;
+		if (potentialNeighbs.length == 0)
+			return count;
+		
+		for (int i=0; i<potentialNeighbs.length;i++) {
+			Node current = potentialNeighbs[i];
+			if ( point.distance(current.getPoint()) < dThreshold )
+				count++;
+		}
+		
+		return count;
+	}
+	
 	
 	//SimpleAvg of all epsilons of neighbors
 	private double calculateAvgEpsilon(Point2D point, Node[] potentialNeighbs) {

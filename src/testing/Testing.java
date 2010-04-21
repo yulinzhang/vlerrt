@@ -200,6 +200,7 @@ public class Testing {
 			if (stat.getElapsedTime() > 0)
 				System.out.println("Alg:" +stat.getAlg() + " Runtime: "+stat.getElapsedTime());
 			//searcher.show();
+			searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
 		}
 		stat.setnNodes(searcher.getSearchTree().nNodes());
 		stats.add(stat); //Store for future processing.
@@ -207,7 +208,7 @@ public class Testing {
 		//searcher.show();
 
 
-		//searcher.screenshot("Exec_"+alg.toString()+"_"+System.currentTimeMillis());
+		//
 
 
 	}
@@ -294,7 +295,11 @@ public class Testing {
 
 	}
 
-	private void advanceStart(double d, boolean choose_begin) { //if choose_begin round down, else round up.
+	
+	
+	
+	
+	private void advanceStart(double d) {
 		LinkedList<Node> l = searcher.collectBestPlan();
 		if (l.getFirst().getPoint().distance(world.goal()) == 0.0)
 			stats.getLast().setAtGoal(true);
@@ -313,22 +318,17 @@ public class Testing {
 			double inc = begin.distance(end);
 			aux += inc;
 			if (aux >= d) {
+				aux -= inc;
 				break; //done
 			}
 
 			begin = end;
 		}	
-
-		if (choose_begin)
-			world.setStart(begin);
-		else {
-			if (end != null)
-				world.setStart(end);
-			else
-				world.setStart(begin);
-		}
-
-
+		double distance = d-aux;
+		double angle = DVLRRTnode.computeAngle(begin, end);
+		
+		Point2D newBegin = new Point2D.Double(begin.getX()+(distance*Math.cos(angle)),begin.getY()-(distance*Math.sin(angle)));
+		world.setStart(newBegin);
 
 	}
 
@@ -441,7 +441,7 @@ public class Testing {
 	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen, RRTResearch.averageStrat strat, int nWaypoints, int nClosest, boolean changeWorld, boolean round) {
 		for (int i=0;i<n;i++) {
 			execSearch(alg,printToScreen, true, strat, nClosest);
-			advanceStart(25.0, round);
+			advanceStart(25.0);
 			wayPoints = genWaypoints(nWaypoints);
 			if (changeWorld)
 				changeWorld();
@@ -461,7 +461,7 @@ public class Testing {
 
 	public static void main(String[] args) throws Exception{
 
-		/*		Testing test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world")); //
+		Testing test = new Testing(50,20, 15, 0, null, new RRTWorld("worlds/RRTpaper-world")); //
 
 
 //		test.execNRuns(50,RRTsearch.Algorithm.RRT,true);
@@ -497,10 +497,7 @@ public class Testing {
 		test.execNRuns(50,RRTsearch.Algorithm.VLRRT);
 		test.execNRuns(50,RRTsearch.Algorithm.DVLRRT);
 		test.printStats("stats_tp_40_15_20_", true);*/
-		for (int i=0;i<50;i++) {
-			megaTest(0.10);
-			megaTest(0.05);
-		}
+
 	}
 
 	public void printer(FileWriter fwr, boolean change, boolean round) throws IOException {
@@ -511,6 +508,12 @@ public class Testing {
 		}
 	}
 
+	
+	public void batch(int nRuns) {
+		
+	}
+	
+	
 	public static void megaTest(double percent) {
 		String s = "megaTests_replanning" + percent + "_"+(System.currentTimeMillis()%1000);
 		RRTResearch.thresholdFactor = percent;

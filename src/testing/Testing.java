@@ -290,16 +290,18 @@ public class Testing {
 	
 	private void advanceStart(double d) {
 		LinkedList<Node> l = searcher.collectBestPlan();
-		if (l.size() == 1)
+		if (l.size() == 1) {
 			stats.getLast().setAtGoal(true);
+			world.setStart(world.goal());
+			return;
+		}
 
 		double aux = 0.0;
-
 
 		//Find between which 2 points the new start will be:
 		Point2D begin = l.getFirst().getPoint();
 		Point2D end = null;
-
+		boolean found = false;
 		Iterator<Node> itr = l.iterator();
 		itr.next();
 		while (itr.hasNext()) {
@@ -308,6 +310,7 @@ public class Testing {
 			aux += inc;
 			if (aux >= d) {
 				aux -= inc;
+				found = true;
 				break; //done
 			}
 
@@ -316,6 +319,11 @@ public class Testing {
 		if (end == null) {
 			world.setStart(begin);
 			return;
+		}
+		if (!found) {
+			world.setStart(world.goal());
+			stats.getLast().setAtGoal(true);
+			return;			
 		}
 		
 		double distance = d-aux;
@@ -432,11 +440,16 @@ public class Testing {
 	public void execNReRuns(int n, RRTsearch.Algorithm alg, boolean printToScreen, boolean replan , RRTResearch.averageStrat strat, int nWaypoints, int nClosest, boolean changeWorld) {
 		for (int i=0;i<n;i++) {
 			execSearch(alg,printToScreen, true, strat, nClosest);
-			advanceStart(25.0);
+			
 			wayPoints = genWaypoints(nWaypoints);
 //			wayPoints = genWaypointsDensity(nWaypoints);
-			if (changeWorld && i<(n-1))
-				world = world.changeWorld();
+			
+			if (i<(n-1)) {
+				advanceStart(25.0);
+				if (changeWorld)
+					world = world.changeWorld();
+			}
+			
 		}
 	}
 
@@ -494,7 +507,11 @@ public class Testing {
 		//		}
 		
 		
-		batch(1,300,"RRTpaper-world");
+		batch(5000,300,"RRTpaper-world");
+		batch(5000,300,"clutter");
+		batch(5000,300,"cluttered");
+		batch(5000,300,"proposal-world");
+		batch(5000,300,"mazzy");
 		
 	}
 
@@ -515,7 +532,7 @@ public class Testing {
 			fwr.write("Algorithm \t Iteration \t Avg. Time\n");
 			
 			double[] runtimes = new double[nIterations];
-			double atGoal = 0;
+			double atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -531,7 +548,7 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_ERRT"+"_"+System.currentTimeMillis());
+				//test.getSearcher().screenshot("Exec_ERRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.ERRT+"_WC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
@@ -539,7 +556,7 @@ public class Testing {
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
 			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -555,7 +572,6 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_ERRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.ERRT+"_NWC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
@@ -563,7 +579,7 @@ public class Testing {
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
 			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -579,15 +595,13 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_VLERRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.VLERRT+"_WC_Simple\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
 			}
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
-			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -603,7 +617,6 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_VLERRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.VLERRT+"_WC_Weighted\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
@@ -611,7 +624,7 @@ public class Testing {
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
 			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -627,7 +640,6 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_VLERRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.VLERRT+"_NWC_Simple\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
@@ -635,7 +647,7 @@ public class Testing {
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
 			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -651,7 +663,6 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_VLERRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.VLERRT+"_NWC_Weighted\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
@@ -659,7 +670,7 @@ public class Testing {
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
 			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -675,7 +686,6 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_DVLERRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.DVLERRT+"_WC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
@@ -683,7 +693,7 @@ public class Testing {
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
 			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -699,7 +709,6 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_DVLERRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.DVLERRT+"_NWC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
@@ -707,7 +716,7 @@ public class Testing {
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
 			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -723,7 +732,6 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_VLRRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.VLRRT+"_WC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
@@ -731,7 +739,7 @@ public class Testing {
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
 			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -747,7 +755,6 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_VLRRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.VLRRT+"_NWC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
@@ -755,7 +762,7 @@ public class Testing {
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
 			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -771,7 +778,6 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_DVLRRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.DVLRRT+"_WC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");
@@ -779,7 +785,7 @@ public class Testing {
 			fwr.write("Avg Goal Itr\t"+(atGoal/(double)nReplans)+"\n\n");
 			
 			runtimes = new double[nIterations];
-			atGoal = 0;
+			atGoal = 0.0;
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
@@ -795,7 +801,6 @@ public class Testing {
 					}
 					i++;
 				}
-				test.getSearcher().screenshot("Exec_DVLRRT"+"_"+System.currentTimeMillis());
 			}
 			for (int i=0;i<nIterations;i++) {
 				fwr.write(RRTsearch.Algorithm.DVLRRT+"_NWC\t"+i+"\t"+(runtimes[i]/(double)nReplans)+"\n");

@@ -66,16 +66,17 @@ public class Testing {
 		}
 
 		public void run() {
-			ActionListener stopper = new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					search.halt();
-				}
-			};
-			javax.swing.Timer timer = new Timer(delay,stopper);
-			timer.setRepeats(false); //stop once...
-			double t0 = System.nanoTime();
-			timer.start();
-			int nItrs = search.runSearchHalt(stats);
+//			ActionListener stopper = new ActionListener() {
+//				public void actionPerformed(ActionEvent e) {
+//					search.halt();
+//					System.err.println(System.nanoTime());
+//				}
+//			};
+//			javax.swing.Timer timer = new Timer(delay,stopper);
+//			timer.setRepeats(false); //stop once...
+			final double t0 = System.nanoTime();
+//			timer.start();
+			int nItrs = search.runSearchHalt(stats,delay);
 			double rtime = System.nanoTime() - t0;
 			stats.setRuntime(rtime);
 			stats.setnIterations(nItrs);

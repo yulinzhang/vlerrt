@@ -147,7 +147,6 @@ public class RRTsearch {
 	protected List<Node> wayPoints;
 	protected Tree searchTree;
 	protected boolean done = false;
-	protected boolean halt = false;
 	
 	protected boolean optimize = false;
 	
@@ -263,21 +262,22 @@ public class RRTsearch {
 		}
 	}
 	
-	public int runSearchHalt(Stats stats) {
+	public int runSearchHalt(Stats stats, int timer) {
 		int nItrs = 0;
 		Node next = null;
 		stats.setInitTime(System.nanoTime());
-		while (!done && !halt) {
+		
+		long init = System.currentTimeMillis();
+		while (!done ) {
 			next = step(stats);
 			if (next != null) searchTree.add(next);
 			nItrs++;
+			
+			if( ( System.currentTimeMillis() - init ) > timer )
+				break;
 		}
 		return nItrs;
 		
-	}
-	
-	public void halt() {
-		halt = true;
 	}
 	
 	public boolean foundGoal() {

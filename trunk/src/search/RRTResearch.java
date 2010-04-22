@@ -352,20 +352,6 @@ public class RRTResearch extends RRTsearch {
 		}	
 	}
 	
-	@Override
-	public int runSearchHalt(Stats stats) {
-		int nItrs = 0;
-		Node next = null;
-		stats.setInitTime(System.nanoTime());
-		while (!done && !halt) {
-			next = step(stats);
-			if (next != null) searchTree.add(next);
-			nItrs++;
-		}
-		return nItrs;
-		
-	}
-	
 	private Node getNewNode(Point2D point, Node parent) {
 		switch(type) {
 		case RRT: 

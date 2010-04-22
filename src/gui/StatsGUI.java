@@ -1,6 +1,9 @@
 package gui;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Random;
+import java.util.Scanner;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -149,9 +152,42 @@ public class StatsGUI extends JFrame {
 		));
 		add(tabs);
 	}
+	
+	public StatsGUI(String st) throws Exception{
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(400,400);
+		
+		Scanner sc = new Scanner(new File(st));
+		sc.nextLine(); //ignore first line.
+		
+		XYSeriesCollection r = new XYSeriesCollection();
+		
+		while( sc.hasNext() ){
+			XYSeries s = new XYSeries("?");
+			for(int j=0;j<300;++j){
+				s.setKey( sc.next() );
+				s.add(sc.nextInt(), sc.nextDouble());
+			}
+			sc.next(); sc.next(); sc.next();
+			r.addSeries(s);
+			
+//			s = new XYSeries( s.getKey()+" average");
+			double average = sc.nextDouble();
+//			s.add(average, 50e6);
+//			s.add(average, 0);
+//			r.addSeries(s);
+		}
+		
+		add(
+			new ChartPanel(ChartFactory.createXYLineChart(
+					st, "iteration #", "time (ns)",
+					r, PlotOrientation.VERTICAL, true, true, false) )
+		);
+
+	}
 
 	public static void main(String[] args) throws Exception{
-		JFrame f = new StatsGUI();
+		JFrame f = new StatsGUI("batcher_80_RRTpaper-world.txt");
 		f.setVisible(true);
 	}
 }

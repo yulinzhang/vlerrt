@@ -156,38 +156,58 @@ public class StatsGUI extends JFrame {
 	public StatsGUI(String st) throws Exception{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(400,400);
-		
+		final int MAX = 300;
 		Scanner sc = new Scanner(new File(st));
 		sc.nextLine(); //ignore first line.
 		
-		XYSeriesCollection r = new XYSeriesCollection();
+		XYSeriesCollection wc = new XYSeriesCollection();
+		XYSeriesCollection nwc = new XYSeriesCollection();
 		
 		while( sc.hasNext() ){
 			XYSeries s = new XYSeries("?");
-			for(int j=0;j<300;++j){
+			for(int j=0;j<MAX;++j){
 				s.setKey( sc.next() );
 				s.add(sc.nextInt(), sc.nextDouble());
 			}
 			sc.next(); sc.next(); sc.next();
-			r.addSeries(s);
+			
 			
 //			s = new XYSeries( s.getKey()+" average");
 			double average = sc.nextDouble();
+			s.setKey( s.getKey()+" "+average );
 //			s.add(average, 50e6);
 //			s.add(average, 0);
 //			r.addSeries(s);
+		
+			if( (s.getKey()+"").contains("_WC") )
+				wc.addSeries(s);
+			else
+				nwc.addSeries(s);
+		
 		}
 		
-		add(
+		JTabbedPane tabs = new JTabbedPane();
+
+		tabs.addTab("_W",
 			new ChartPanel(ChartFactory.createXYLineChart(
 					st, "iteration #", "time (ns)",
-					r, PlotOrientation.VERTICAL, true, true, false) )
+					wc, PlotOrientation.VERTICAL, true, true, false) )
 		);
 
+		tabs.addTab("_NWC",
+			new ChartPanel(ChartFactory.createXYLineChart(
+					st, "iteration #", "time (ns)",
+					nwc, PlotOrientation.VERTICAL, true, true, false) )
+		);
+		
+		add(tabs);
 	}
 
 	public static void main(String[] args) throws Exception{
-		JFrame f = new StatsGUI("batcher_80_RRTpaper-world.txt");
+
+//		JFrame f = new StatsGUI("batcher_80_RRTpaper-world.txt");
+//		JFrame f = new StatsGUI("batcher_634_RRTpaper-world");
+		JFrame f = new StatsGUI("batcher_519_clutter.txt");
 		f.setVisible(true);
 	}
 }

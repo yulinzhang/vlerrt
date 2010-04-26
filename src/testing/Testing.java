@@ -356,8 +356,8 @@ public class Testing {
 			int[] densities = new int[array.length];
 			int max = 0;
 			for(int i=0;i<array.length;++i){
-				densities[i] = r.calculateDensity(array[i]);
-				max += densities[i];
+				densities[i] = r.calculateDensity(array[i])+1;
+				max += densities[i]+1;
 			}
 
 			//invert count to get min density as more probable
@@ -371,7 +371,7 @@ public class Testing {
 			for (int i=0;i<nWaypoints;i++) {
 				int n = rng.nextInt(n_max);
 				for(int j=0;i<array.length;++j){
-					n -= densities[i];
+					n -= densities[j];
 					if( n<=0 ){
 						res.add( array[j] );
 						break;
@@ -515,9 +515,9 @@ public class Testing {
 //		batch(false,500,100,"cluttered",15);
 //		batch(false,500,100,"proposal-world",15);
 
-		batch(true,500,100,"RRTpaper-world",15);
-		batch(true,500,100,"cluttered",15);
-		batch(true,500,100,"proposal-world",15);
+//		batch(true,50,100,"RRTpaper-world",15);
+		batch(true,50,100,"cluttered",15);
+//		batch(true,50,100,"proposal-world",15);
 		
 /*		batch(false,1000,100,"RRTpaper-world",20);
 		batch(false,1000,100,"cluttered",20);

@@ -511,7 +511,23 @@ public class Testing {
 		//		}
 		
 		
-		batch(false,2000,200,"RRTpaper-world");
+//		batch(false,500,100,"RRTpaper-world",15);
+//		batch(false,500,100,"cluttered",15);
+//		batch(false,500,100,"proposal-world",15);
+
+		batch(true,500,100,"RRTpaper-world",15);
+		batch(true,500,100,"cluttered",15);
+		batch(true,500,100,"proposal-world",15);
+		
+/*		batch(false,1000,100,"RRTpaper-world",20);
+		batch(false,1000,100,"cluttered",20);
+		batch(false,1000,100,"proposal-world",20);
+
+		batch(true,1000,100,"RRTpaper-world",20);
+		batch(true,1000,100,"cluttered",20);
+		batch(true,1000,100,"proposal-world",20); */
+		
+		
 //		batch(5000,300,"clutter");
 //		batch(5000,300,"cluttered");
 //		batch(5000,300,"proposal-world");
@@ -528,8 +544,8 @@ public class Testing {
 	}
 
 	
-	public static void batch(boolean den, int nReplans, int nIterations, String world) {
-		String s = "batcher_" + (System.currentTimeMillis()%1000)+"("+den+")";
+	public static void batch(boolean den, int nReplans, int nIterations, String world, int nWaypoints) {
+		String s = "batcher_wp"+nWaypoints+"_" + (System.currentTimeMillis()%1000)+"("+den+")";
 		try {
 			FileWriter fwr = new FileWriter(s + "_" + world);
 			Testing test ;
@@ -542,7 +558,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.ERRT, false, true, null, 10, 10, true);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.ERRT, false, true, null, nWaypoints, 10, true);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -567,7 +583,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.ERRT, false, true, null, 10, 10, false);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.ERRT, false, true, null, nWaypoints, 10, false);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -591,7 +607,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Simple, 10, 10, true);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Simple, nWaypoints, 10, true);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -613,7 +629,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Weighted, 10, 10, true);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Weighted, nWaypoints, 10, true);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -637,7 +653,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Simple, 10, 10, false);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Simple, nWaypoints, 10, false);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -661,7 +677,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Weighted, 10, 10, false);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLERRT, false, true, RRTResearch.averageStrat.Weighted, nWaypoints, 10, false);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -685,7 +701,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.DVLERRT, false, true, RRTResearch.averageStrat.Weighted, 10, 10, true);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.DVLERRT, false, true, RRTResearch.averageStrat.Weighted, nWaypoints, 10, true);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -709,7 +725,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.DVLERRT, false, true, RRTResearch.averageStrat.Weighted, 10, 10, false);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.DVLERRT, false, true, RRTResearch.averageStrat.Weighted, nWaypoints, 10, false);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -733,7 +749,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLRRT, false, false, null, 10, 10, true);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLRRT, false, false, null, nWaypoints, 10, true);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -757,7 +773,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLRRT, false, false, null, 10, 10, false);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.VLRRT, false, false, null, nWaypoints, 10, false);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -781,7 +797,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.DVLRRT, false, false, null, 10, 10, true);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.DVLRRT, false, false, null, nWaypoints, 10, true);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {
@@ -805,7 +821,7 @@ public class Testing {
 			for (int j=0;j<nReplans;j++) {
 				boolean aux = false;
 				test = new Testing(50,20,15,0, null, new RRTWorld("worlds/"+world));
-				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.DVLRRT, false, false, null, 10, 10, false);
+				test.execNReRuns(den,nIterations, RRTsearch.Algorithm.DVLRRT, false, false, null, nWaypoints, 10, false);
 				Iterator<Stats> itr = test.stats.iterator();
 				int i = 0;
 				while (itr.hasNext()) {

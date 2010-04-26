@@ -232,6 +232,9 @@ public class RRTResearch extends RRTsearch {
 	public int calculateDensity(Node node) {
 		Point2D point = node.getPoint();
 		Node[] potentialNeighbs = searchTree.nClosestTo(point, nClosest);
+		if (potentialNeighbs == null)
+			return 0;
+		
 		int count = 0;
 		if (potentialNeighbs.length == 0)
 			return count;

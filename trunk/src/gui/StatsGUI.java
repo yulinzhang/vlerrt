@@ -156,7 +156,7 @@ public class StatsGUI extends JFrame {
 	public StatsGUI(String st) throws Exception{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(400,400);
-		final int MAX = 300;
+		final int MAX = 100;
 		Scanner sc = new Scanner(new File(st));
 		sc.nextLine(); //ignore first line.
 		
@@ -207,7 +207,18 @@ public class StatsGUI extends JFrame {
 
 //		JFrame f = new StatsGUI("batcher_80_RRTpaper-world.txt");
 //		JFrame f = new StatsGUI("batcher_634_RRTpaper-world");
-		JFrame f = new StatsGUI("batcher_519_clutter.txt");
+		JFrame f = new StatsGUI(
+//				"batcher_wp15_424(false)_cluttered"
+				"batcher_wp15_972(true)_cluttered"
+//				"batcher_wp15_663(false)_proposal-world"
+
+//				"batcher_wp15_328(true)_RRTpaper-world"
+//								"batcher_wp15_827(true)_proposal-world"
+//				"batcher_wp15_524(false)_RRTpaper-world"
+//				"batcher_wp15_894(false)_RRTpaper-world"
+//				"batcher_wp15_717(true)_cluttered"
+//				"batcher_wp15_50(true)_RRTpaper-world"
+		);
 		f.setVisible(true);
 	}
 }

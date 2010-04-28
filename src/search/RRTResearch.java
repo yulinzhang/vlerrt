@@ -296,9 +296,9 @@ public class RRTResearch extends RRTsearch {
 			if (current instanceof VLRRTnode) {
 				d = point.distance(current.getPoint());
 				if (d < dThreshold) {
-					res += ((VLRRTnode)current).epsilon * d;
+					res += ((VLRRTnode)current).epsilon * 1/d;
 					count++;
-					distance += d;
+					distance += 1/d;
 				}	
 			}
 		}

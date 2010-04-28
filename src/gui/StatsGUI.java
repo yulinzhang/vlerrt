@@ -1,7 +1,6 @@
 package gui;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -153,10 +152,9 @@ public class StatsGUI extends JFrame {
 		add(tabs);
 	}
 	
-	public StatsGUI(String st) throws Exception{
+	public StatsGUI(String st, int MAX) throws Exception{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(400,400);
-		final int MAX = 100;
 		Scanner sc = new Scanner(new File(st));
 		sc.nextLine(); //ignore first line.
 		
@@ -209,13 +207,21 @@ public class StatsGUI extends JFrame {
 //		JFrame f = new StatsGUI("batcher_634_RRTpaper-world");
 		JFrame f = new StatsGUI(
 //				"batcher_wp15_424(false)_cluttered"
-				"batcher_wp15_972(true)_cluttered"
 //				"batcher_wp15_663(false)_proposal-world"
-
-//				"batcher_wp15_328(true)_RRTpaper-world"
-//								"batcher_wp15_827(true)_proposal-world"
 //				"batcher_wp15_524(false)_RRTpaper-world"
 //				"batcher_wp15_894(false)_RRTpaper-world"
+
+//				"batcher_wp15_972(true)_cluttered"
+//				"batcher_wp15_827(true)_proposal-world"
+				//"batcher_wp15_328(true)_RRTpaper-world"
+				
+//				"final_wp15_13(true)_RRTpaper-world"
+				"final_wp15_74(false)_RRTpaper-world"
+//				"final_wp15_249(false)_cluttered"
+//				"final_wp15_74(false)_RRTpaper-world"
+				, 50
+				
+				
 //				"batcher_wp15_717(true)_cluttered"
 //				"batcher_wp15_50(true)_RRTpaper-world"
 		);

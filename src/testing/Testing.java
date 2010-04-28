@@ -352,8 +352,8 @@ public class Testing {
 		List<Node> res = new LinkedList<Node>();
 		if( searcher instanceof RRTResearch && l.size() > 0 ){
 			RRTResearch r = (RRTResearch) searcher;
-			Node[] array = l.toArray(new Node[l.size()]);
-			int[] densities = new int[array.length];
+			final Node[] array = l.toArray(new Node[l.size()]);
+			final int[] densities = new int[array.length];
 			int max = 0;
 			for(int i=0;i<array.length;++i){
 				densities[i] = r.calculateDensity(array[i])+1;
@@ -361,16 +361,16 @@ public class Testing {
 			}
 
 			//invert count to get min density as more probable
-			int n_max = 0;
-			for(int i=0;i<array.length;++i){
-				densities[i] = max - densities[i];
-				n_max += densities[i]; 
-			}
+//			int n_max = 0;
+//			for(int i=0;i<array.length;++i){
+//				densities[i] = max - densities[i];
+//				n_max += densities[i]; 
+//			}
 
 			Random rng = new Random(System.nanoTime());
 			for (int i=0;i<nWaypoints;i++) {
-				int n = rng.nextInt(n_max);
-				for(int j=0;i<array.length;++j){
+				int n = rng.nextInt(max);
+				for(int j=0;j<array.length;++j){
 					n -= densities[j];
 					if( n<=0 ){
 						res.add( array[j] );
@@ -511,13 +511,16 @@ public class Testing {
 		//		}
 		
 		
-//		batch(false,500,100,"RRTpaper-world",15);
-//		batch(false,500,100,"cluttered",15);
-//		batch(false,500,100,"proposal-world",15);
+		int it_n = 100;
+		int avg = 50;
+		
+		batch(false,avg,it_n,"RRTpaper-world",15);
+		batch(false,avg,it_n,"cluttered",15);
+		batch(false,avg,it_n,"proposal-world",15);
 
-//		batch(true,50,100,"RRTpaper-world",15);
-		batch(true,50,100,"cluttered",15);
-//		batch(true,50,100,"proposal-world",15);
+		batch(true,avg,it_n,"RRTpaper-world",15);
+		batch(true,avg,it_n,"cluttered",15);
+		batch(true,avg,it_n,"proposal-world",15);
 		
 /*		batch(false,1000,100,"RRTpaper-world",20);
 		batch(false,1000,100,"cluttered",20);
@@ -545,7 +548,7 @@ public class Testing {
 
 	
 	public static void batch(boolean den, int nReplans, int nIterations, String world, int nWaypoints) {
-		String s = "batcher_wp"+nWaypoints+"_" + (System.currentTimeMillis()%1000)+"("+den+")";
+		String s = "finals/final_wp"+nWaypoints+"_" + (System.currentTimeMillis()%1000)+"("+den+")";
 		try {
 			FileWriter fwr = new FileWriter(s + "_" + world);
 			Testing test ;

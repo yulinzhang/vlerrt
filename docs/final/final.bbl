@@ -1,0 +1,31 @@
+\begin{thebibliography}{JYLS05}
+
+\bibitem[BV02]{Bruce02real-timerandomized}
+James Bruce and Manuela Veloso.
+\newblock Real-time randomized path planning for robot navigation, 2002.
+
+\bibitem[CH67]{citeulike:995135}
+T.~Cover and P.~Hart.
+\newblock Nearest neighbor pattern classification.
+\newblock {\em Information Theory, IEEE Transactions on}, 13(1):21--27, 1967.
+
+\bibitem[JYLS05]{Jaillet05adaptivetuning}
+Léonard Jaillet, Anna Yershova, Steven~M. LaValle, and Thierry Siméon.
+\newblock Adaptive tuning of the sampling domain for dynamic-domain rrts, 2005.
+
+\bibitem[Lav98]{Lavalle98rapidly-exploringrandom}
+Steven~M. Lavalle.
+\newblock Rapidly-exploring random trees: A new tool for path planning.
+\newblock Technical report, 1998.
+
+\bibitem[LL04]{Lindemann04incrementallyreducing}
+Stephen~R. Lindemann and Steven~M. LaValle.
+\newblock Incrementally reducing dispersion by increasing voronoi bias in rrts,
+  2004.
+
+\bibitem[YL09]{moplan2009}
+Anna Yershova and Steven~M. Lavalle.
+\newblock Motion planning for highly constrained spaces.
+\newblock In {\em Robot Motion and Control 2009}. 2009.
+
+\end{thebibliography}

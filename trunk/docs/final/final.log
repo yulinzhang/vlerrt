@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009) (format=pdflatex 2009.11.7)  29 APR 2010 11:07
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009) (format=pdflatex 2009.11.7)  29 APR 2010 17:46
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -307,7 +307,11 @@ LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <12> not available
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 72.
 
-[2] [3] (./final.bbl [4]
+[2] [3]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [4]
+(./final.bbl
 Missing character: There is no Ã in font pplr7t!
 Missing character: There is no © in font pplr7t!
 Missing character: There is no Ã in font pplr7t!
@@ -317,46 +321,49 @@ Underfull \hbox (badness 1728) in paragraph at lines 22--25
 []\OT1/ppl/m/n/10 Stephen R. Lin-de-mann and Steven M.
  []
 
-) <paper_world.png, id=87, 1013.7875pt x 612.2875pt>
+) <paper_world.png, id=90, 1013.7875pt x 612.2875pt>
 File: paper_world.png Graphic file (type png)
  <use paper_world.png>
-<cluttered_world.png, id=88, 1013.7875pt x 612.2875pt>
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<cluttered_world.png, id=91, 1013.7875pt x 612.2875pt>
 File: cluttered_world.png Graphic file (type png)
 
 <use cluttered_world.png>
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<prop_world.png, id=89, 1013.7875pt x 612.2875pt>
+<prop_world.png, id=92, 1013.7875pt x 612.2875pt>
 File: prop_world.png Graphic file (type png)
  <use prop_world.png>
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<maze_wc.png, id=90, 1208.515pt x 620.3175pt>
+<maze_wc.png, id=93, 1208.515pt x 620.3175pt>
 File: maze_wc.png Graphic file (type png)
  <use maze_wc.png>
-Overfull \hbox (12.19872pt too wide) in paragraph at lines 272--273
+Overfull \hbox (12.19872pt too wide) in paragraph at lines 275--276
  [] 
  []
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<obstructed_wc.png, id=91, 1208.515pt x 629.35126pt>
+<obstructed_wc.png, id=94, 1208.515pt x 629.35126pt>
 File: obstructed_wc.png Graphic file (type png)
  <use obstructed_wc.png>
-Overfull \hbox (12.19872pt too wide) in paragraph at lines 280--281
+Overfull \hbox (12.19872pt too wide) in paragraph at lines 283--284
  [] 
  []
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<cluttered_wc.png, id=92, 1208.515pt x 628.3475pt>
+<cluttered_wc.png, id=95, 1208.515pt x 628.3475pt>
 File: cluttered_wc.png Graphic file (type png)
  <use cluttered_wc.png>
-Overfull \hbox (12.19872pt too wide) in paragraph at lines 288--289
+Overfull \hbox (12.19872pt too wide) in paragraph at lines 291--292
  [] 
  []
 
@@ -369,13 +376,13 @@ rld.png (PNG copy)>] [6
  <./maze_wc.png (PNG copy)> <./obstructed_wc.png (PNG copy)> <./cluttered_wc.pn
 g (PNG copy)>] (./final.aux) ) 
 Here is how much of TeX's memory you used:
- 4796 strings out of 493848
- 69146 string characters out of 3149207
- 146955 words of memory out of 3000000
- 7951 multiletter control sequences out of 15000+200000
+ 4798 strings out of 493848
+ 69166 string characters out of 3149207
+ 147955 words of memory out of 3000000
+ 7952 multiletter control sequences out of 15000+200000
  21085 words of font info for 61 fonts, out of 3000000 for 9000
  714 hyphenation exceptions out of 8191
- 45i,11n,45p,818b,392s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 45i,11n,45p,818b,298s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/local/texlive/2009/texmf-dist/fonts/enc/dvi
 ps/base/8r.enc}</usr/local/texlive/2009/texmf-dist/fonts/type1/public/amsfonts/
 cm/cmmi10.pfb></usr/local/texlive/2009/texmf-dist/fonts/type1/public/amsfonts/c
@@ -384,9 +391,9 @@ cmsy10.pfb></usr/local/texlive/2009/texmf-dist/fonts/type1/public/amsfonts/cm/c
 msy7.pfb></usr/local/texlive/2009/texmf-dist/fonts/type1/urw/palatino/uplb8a.pf
 b></usr/local/texlive/2009/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr
 /local/texlive/2009/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on final.pdf (6 pages, 736816 bytes).
+Output written on final.pdf (6 pages, 738150 bytes).
 PDF statistics:
- 140 PDF objects out of 1000 (max. 8388607)
- 34 named destinations out of 1000 (max. 500000)
- 119 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 144 PDF objects out of 1000 (max. 8388607)
+ 35 named destinations out of 1000 (max. 500000)
+ 127 words of extra memory for PDF output out of 10000 (max. 10000000)
 

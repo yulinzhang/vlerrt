@@ -112,7 +112,7 @@ generated worlds and records relevant statistics such as time spent to find the 
 The metrics we used to compare DVLRRT, VLRRT and RRT-GoalBias for this report are success rate (in terms of finding the goal) and running
 time. For DVLRRT and VLRRT, we also analyzed how the several $\epsilon$ modification schemes affect overall performance.
 
-\section{Preliminary Results}
+\section{Planning Results}
 
 We executed each algorithm 10000 times, in several representative worlds, with a time limit of 50 milliseconds: 
 a maze-like world \emph{maze} (similar to the one in
@@ -217,29 +217,34 @@ VLRRT (M3/R1) & 16\% & -15\%\\
 \caption{Overall Gains versus RRT}
 \end{figure}
 
-\section{Progress and Future Steps}
-
-We have successfully implemented and evaluated two strategies that improve RRT-GoalBias by
-taking into account information about the world during planning. We will now
-direct our efforts into using the collected information to further improve performance
-in re-planning scenarios (in comparison to ERRT). 
-
-Our claim is that if the information we collect
-about the world does indeed produce good results, then we should be able to incorporate that
-information in subsequent executions (i.e re-planning) by extrapolating the unobstructed regions of
-the world from the $\epsilon$ values of the previous executions. A possible way to do this is
-to generate the regions using a K-Nearest Neighbors algorithm \cite{citeulike:995135}. Under the reasonable assumption
-that the world doesn't change too much between executions, we can use the region information to
-\emph{a priori} inform the $\epsilon$ values of points that fall
-within said regions.
-
 \section{Re-planning}
 
 asd
 
-\section{Conclusions}
+\section{Results Re-planning}
 
 asd
+
+%\section{Progress and Future Steps}
+
+%We have successfully implemented and evaluated two strategies that improve RRT-GoalBias by
+%taking into account information about the world during planning. We will now
+%direct our efforts into using the collected information to further improve performance
+%in re-planning scenarios (in comparison to ERRT). 
+
+%Our claim is that if the information we collect
+%about the world does indeed produce good results, then we should be able to incorporate that
+%information in subsequent executions (i.e re-planning) by extrapolating the unobstructed regions of
+%the world from the $\epsilon$ values of the previous executions. A possible way to do this is
+%to generate the regions using a K-Nearest Neighbors algorithm \cite{citeulike:995135}. Under the reasonable assumption
+%that the world doesn't change too much between executions, we can use the region information to
+%\emph{a priori} inform the $\epsilon$ values of points that fall
+%within said regions.
+
+
+\section{Conclusions}
+
+Our results show that we can significantly reduce planning time and increase robustness by employing online learning techniques to RRT, at the cost of an increased path length. However, reusing this data for re-planning proved to be more difficult: there were no significant performance gains from computing estimations of the new world based on the previous information when compared to just consulting the world, which also shows the flexibility of our regular planning techniques.
 
 \bibliography{AIbib}{}
 \bibliographystyle{alpha}

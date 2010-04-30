@@ -219,26 +219,31 @@ VLRRT (M3/R1) & 16\% & -15\%\\
 
 \section{Re-planning}
 
-We are now in a situation were the world has changed slightly and our goal is to try to extract as much useful information as possible from what was gathered by the previous search in hopes of reaching the goal faster than just re-starting the search from scratch with the new conditions. However, our approach needs to be very lightweight as we cannot spend too much time analyzing the old information or we risk not gaining enough to compete against the large amount of exploration the standard random algorithm does.
+We are now in a situation were the world has changed slightly and our goal is to try to extract as much useful information as possible from what was gathered by the previous search in hopes of reaching the goal faster than just re-starting the search from scratch with the new conditions. However, our approach needs to be very lightweight as we cannot spend too much time analyzing the old data or risk not gaining enough to compete against the large amount of exploration the standard random algorithm does.
+
+For the re-planning part we base our algorithms on ERRT~\cite{Bruce02real-timerandomized} that expands standard RRT with waypoints randomly extracted from the previous path to goal. Thus, all our variants were extended to include waypoints in the same fashion as ERRT.
 
 With this in mind, we defined the following re-planning improvements:
 
 \begin{description}
-\item[Estimate a good initial step] - use the old tree to compute a better initial step for each node. This approximation is different for each of the variants:
+\item[Estimate a good initial step] - use the old tree to compute a better initial step for each new node of the search. Each approximation is only valid for one of the variants:
 \begin{itemize}
-\item (VL) simple average of $\epsilon$ values from the $K$ nearest neighbors;
+\item (VL) simple average of $\epsilon$ values from the $K$ nearest neighbors of the previous tree;
 \item (VL) weighted average (based on the distance to the new node) of $\epsilon$ values from the $K$ nearest neighbors; 
 \item (DVL) pull the directional information from the nearest neighbors (adjusting the angle appropriately).
 \end{itemize}
 
-\item[bias waypoint generation] - the standard ERRT paper uses random nodes from the previous path to goal as waypoints. We tried to bias this random pick by giving higher probabilities to nodes that are in areas with less neighbors (lower densities). The idea was that these would be more valuable since such narrow paths are more difficult to go through. However, our results (even without changing the world) actually show some performance degradation or no significant changes and thus we will not show the results in detail due to space constraints.
+\item[Bias waypoint generation] - the standard ERRT paper uses random nodes from the previous path to goal as waypoints. We tried to improve this by biasing this random pick to nodes that are in areas with less neighbors (lower densities). The intuition was that these would be more valuable since such narrow paths are more difficult to go through. However, our results (even without changing the world) actually show some performance degradation or no significant changes at all and thus we will not show the results in detail due to space constraints.
 \end{description}
 
 \section{Re-planning Results}
 
-For re-planning, we used the average of 1000 test runs each with 100 iterations where the start point is moved slightly towards the goal (using the path that got nearest, if none reached it) each with the same 50 ms\footnote{SPECS!} time slice, and causing small changes in the world (brownian motion: small random shifts in the position of the obstacles).
+For re-planning, we used the runtime average of 1000 test runs each with 100 iterations where the start point is moved slightly towards the goal (using the path that got nearest to it, if none reached it) each with the same 50 ms\footnote{on a 2.26 GHz Intel Core 2 Duo with 4 GB} time slice as before, and causing small changes in the world (brownian motion: small random shifts in the position of the obstacles).
 
-Our results (Figs. \ref{replanning_maze}, \ref{replanning_obstructed}, \ref{replanning_cluttered}) show that there were no significant gains from using the more complex techniques (that try to compute a better initial step) when compared with just using the traditional (planning) versions. As before, both variant do rather well when compared to ERRT.
+Our results (Figs. \ref{replanning_maze}, \ref{replanning_obstructed}, \ref{replanning_cluttered}) 
+show three groups: one for ERRT, another for the VL variants and the final one for both DVL alternatives. Thus, there were no significant gains from using the more complex learning techniques (that try to compute a better initial step from the previous tree) when compared with just using the traditional (planning) versions as the average runtimes are virtually identical. As before, both variant do rather well when compared to ERRT on most worlds although the overhead of DVL is considerable when compared to VL.
+
+Overall, this shows that the online learning techniques employed for VLRRT are sufficiently advanced to cope with this kind of brownian motion in the world and capable of extracting information (by testing) much quicker than any of our re-planning improvements.
 
 %\section{Progress and Future Steps}
 
@@ -259,7 +264,8 @@ Our results (Figs. \ref{replanning_maze}, \ref{replanning_obstructed}, \ref{repl
 
 \section{Conclusions}
 
-Our results show that we can significantly reduce planning time and increase robustness by employing online learning techniques to RRT, at the cost of an increased path length. However, reusing this data for re-planning proved to be more difficult: there were no significant performance gains from computing estimations of the new world based on the previous information when compared to just consulting the world, which also shows the flexibility of our regular planning techniques.
+We have shown that we can significantly reduce planning time and increase robustness by employing online learning techniques to RRT, at the cost of an increased path length. Directional information proved not to produce meaningful benefits (most likely due to the small number of extensions applied to each node), while a simple combination of multiplicative increases combined with a step reset on failure was the alternative with best results. 
+However, reusing this data for re-planning proved to be more difficult: there were no significant performance gains from computing estimations of the new world based on the previous information when compared to just consulting the world, which also shows the flexibility of our regular planning techniques that are able to adjust very quickly to any new situation.
 
 \bibliography{AIbib}{}
 \bibliographystyle{alpha}

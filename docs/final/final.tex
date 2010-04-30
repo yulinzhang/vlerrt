@@ -114,7 +114,7 @@ time. For DVLRRT and VLRRT, we also analyzed how the several $\epsilon$ modifica
 
 \section{Planning Results}
 
-We executed each algorithm 10000 times, in several representative worlds, with a time limit of 50 milliseconds: 
+We executed each algorithm 10000 times, in several representative worlds, with a time limit of 50 milliseconds \footnote{SPECS!!}: 
 a maze-like world \emph{maze} (similar to the one in
 \cite{Bruce02real-timerandomized}), a largely unobstructed world with
 a particularly obstructed region 
@@ -158,9 +158,9 @@ of success rate (in terms of finding the goal) of approximately
 $16\%$ and a decrease in running time of approximately $15\%$,
 depending on the type of world we consider.
 
-To conclude, our preliminary results further increase our confidence that our approach can indeed produce effective gains in
-planning and that exploiting the gathered information for re-planning purposes should increase the performance gains
-even further.
+%To conclude, our preliminary results further increase our confidence that our approach can indeed produce effective gains in
+%planning and that exploiting the gathered information for re-planning purposes should increase the performance gains
+%even further.
 
 \begin{figure}[t]
 \begin{center}
@@ -219,11 +219,26 @@ VLRRT (M3/R1) & 16\% & -15\%\\
 
 \section{Re-planning}
 
-asd
+We are now in a situation were the world has changed slightly and our goal is to try to extract as much useful information as possible from what was gathered by the previous search in hopes of reaching the goal faster than just re-starting the search from scratch with the new conditions. However, our approach needs to be very lightweight as we cannot spend too much time analyzing the old information or we risk not gaining enough to compete against the large amount of exploration the standard random algorithm does.
 
-\section{Results Re-planning}
+With this in mind, we defined the following re-planning improvements:
 
-asd
+\begin{description}
+\item[Estimate a good initial step] - use the old tree to compute a better initial step for each node. This approximation is different for each of the variants:
+\begin{itemize}
+\item (VL) simple average of $\epsilon$ values from the $K$ nearest neighbors;
+\item (VL) weighted average (based on the distance to the new node) of $\epsilon$ values from the $K$ nearest neighbors; 
+\item (DVL) pull the directional information from the nearest neighbors (adjusting the angle appropriately).
+\end{itemize}
+
+\item[bias waypoint generation] - the standard ERRT paper uses random nodes from the previous path to goal as waypoints. We tried to bias this random pick by giving higher probabilities to nodes that are in areas with less neighbors (lower densities). The idea was that these would be more valuable since such narrow paths are more difficult to go through. However, our results (even without changing the world) actually show some performance degradation or no significant changes and thus we will not show the results in detail due to space constraints.
+\end{description}
+
+\section{Re-planning Results}
+
+For re-planning, we used the average of 1000 test runs each with 100 iterations where the start point is moved slightly towards the goal (using the path that got nearest, if none reached it) each with the same 50 ms\footnote{SPECS!} time slice, and causing small changes in the world (brownian motion: small random shifts in the position of the obstacles).
+
+Our results (Figs. \ref{replanning_maze}, \ref{replanning_obstructed}, \ref{replanning_cluttered}) show that there were no significant gains from using the more complex techniques (that try to compute a better initial step) when compared with just using the traditional (planning) versions. As before, both variant do rather well when compared to ERRT.
 
 %\section{Progress and Future Steps}
 
@@ -274,25 +289,28 @@ Our results show that we can significantly reduce planning time and increase rob
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[scale=0.2]{maze_wc.png}
+\includegraphics[scale=0.15]{maze_wc.png}
 \end{center}
 \caption{Maze re-planning.}
+\label{replanning_maze}
 \end{figure}
 
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[scale=0.2]{obstructed_wc.png}
+\includegraphics[scale=0.15]{obstructed_wc.png}
 \end{center}
 \caption{Obstructed re-planning.}
+\label{replanning_obstructed}
 \end{figure}
 
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[scale=0.2]{cluttered_wc.png}
+\includegraphics[scale=0.15]{cluttered_wc.png}
 \end{center}
 \caption{Cluttered re-planning.}
+\label{replanning_cluttered}
 \end{figure}
 
 \end{document}

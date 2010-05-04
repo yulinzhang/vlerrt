@@ -117,15 +117,15 @@ time. For DVLRRT and VLRRT, we also analyzed how the several $\epsilon$ modifica
 \section{Planning Results}
 
 We executed each algorithm 10000 times, in several representative
-worlds, with a time limit of 50 milliseconds \footnote{Karl's
-  computer's specs}: 
+worlds, with a time limit of 50 milliseconds \footnote{on a 2.66 GHz Intel Core 2 Duo with
+  4 GB RAM}: 
 a maze-like world \emph{maze} (similar to the one in
 \cite{Bruce02real-timerandomized}), a largely unobstructed world with
 a particularly obstructed region 
 in the path to the goal \emph{obstructed} and a more highly cluttered world \emph{cluttered}.
 
 We can observe that in all the test worlds, our algorithms perform
-generally better (or as good) than RRT-GoalBias,
+generally better (or nor worse) than RRT-GoalBias,
 achieving higher average success rates and lower average execution
 times, noting that in worlds where RRT-GoalBias already performs
 very well, the gains achieved by our algorithms are naturally smaller.
@@ -228,10 +228,12 @@ the previous planning iteration.
 Our goal is to attempt to extract as much useful information as
 possible from what was gathered by the previous 
 search, in the hope of reaching the goal faster than by just re-starting
-the search from scratch for the new world configuration. 
-However, our approach needs to be very lightweight given that we cannot spend 
-too much time analyzing the old data. Doing so would risk not gaining enough to
-compete against the large amount of exploration the standard algorithms do.
+the search from scratch for the new world configuration.  However, we have to
+be very frugal with computation in order to make our abstraction 
+worthwhile.  If time were no object, we would simply test the world
+to get perfect information.  Thus, the challenge is to extract the
+pieces of information that will assist in re-planning without spending much time
+analyzing or refining the data.
 
 For this re-planning component we base our algorithms on
 ERRT~\cite{Bruce02real-timerandomized} 
@@ -270,7 +272,7 @@ For re-planning, we used the runtime average of 1000 test runs each
 with 100 planning iterations where the start point is slightly
 advanced towards the goal (using the path that got nearest to it, if none reached it)
 each with the same 50 ms\footnote{on a 2.26 GHz Intel Core 2 Duo with
-  4 GB} time slice as before, and causing small changes in the world
+  4 GB RAM} time slice as before, and causing small changes in the world
 (Brownian motion - small random shifts in the position of the
 obstacles). We tested the performance of all replanning algorithms, 
 and our initial planning algorithms (basic VL and DVLRRT).

@@ -117,8 +117,9 @@ time. For DVLRRT and VLRRT, we also analyzed how the several $\epsilon$ modifica
 \section{Planning Results}
 
 We executed each algorithm 10000 times, in several representative
-worlds, with a time limit of 50 milliseconds \footnote{on a 2.66 GHz Intel Core 2 Duo with
-  4 GB RAM}: 
+worlds, with a time limit of 50 milliseconds 
+%\footnote{on a 2.66 GHz Intel Core 2 Duo with  4 GB RAM}
+: 
 a maze-like world \emph{maze} (similar to the one in
 \cite{Bruce02real-timerandomized}), a largely unobstructed world with
 a particularly obstructed region 
@@ -271,8 +272,8 @@ The ERRT algorithm uses random
 For re-planning, we used the runtime average of 1000 test runs each
 with 100 planning iterations where the start point is slightly
 advanced towards the goal (using the path that got nearest to it, if none reached it)
-each with the same 50 ms\footnote{on a 2.26 GHz Intel Core 2 Duo with
-  4 GB RAM} time slice as before, and causing small changes in the world
+each with the same 50 ms %\footnote{on a 2.26 GHz Intel Core 2 Duo with 4 GB RAM} 
+  time slice as before, and causing small changes in the world
 (Brownian motion - small random shifts in the position of the
 obstacles). We tested the performance of all replanning algorithms, 
 and our initial planning algorithms (basic VL and DVLRRT).
